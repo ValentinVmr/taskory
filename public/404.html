@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Taskory</title>
+    <script>
+      // Redirige vers index.html en préservant le chemin pour le routing Angular
+      const path = window.location.pathname;
+      window.location.replace('/?redirect=' + encodeURIComponent(path));
+    </script>
+  </head>
+  <body></body>
+</html>
+
