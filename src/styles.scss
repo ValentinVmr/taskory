@@ -1,0 +1,85 @@
+/* You can add global styles to this file, and also import other style files */
+
+@use '@angular/material' as mat;
+
+$todo-plus-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$azure-palette,
+    tertiary: mat.$rose-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto',
+  ),
+  density: (
+    scale: 0,
+  )
+));
+
+html {
+  @include mat.all-component-themes($todo-plus-theme);
+  @include mat.core();
+  color-scheme: light;
+}
+
+// Material Icons font
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+// Fix mat-form-field label & error colors
+.mat-mdc-form-field {
+  width: 100%;
+
+  .mat-mdc-floating-label {
+    color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  &.mat-form-field-invalid .mat-mdc-floating-label {
+    color: #c62828 !important;
+  }
+}
+
+.mat-mdc-form-field-error {
+  color: #c62828 !important;
+  font-size: 0.75rem;
+}
+
+mat-error, .mat-error {
+  color: #c62828 !important;
+}
+
+// Fix outline field notch label
+.mdc-notched-outline__notch {
+  border-right: none !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  background: #f7f8fc;
+  color: #212121;
+  display: flex;
+  justify-content: center;
+}
+
+app-root {
+  width: 100%;
+  max-width: 720px;
+}
+
+html, body { height: 100%; }

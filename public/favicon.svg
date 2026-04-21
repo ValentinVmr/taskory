@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Fond arrondi -->
+  <rect width="64" height="64" rx="14" fill="#3f51b5"/>
+  <!-- Corps du carnet -->
+  <rect x="14" y="12" width="36" height="42" rx="4" fill="white" opacity="0.95"/>
+  <!-- Reliure gauche -->
+  <rect x="12" y="12" width="6" height="42" rx="3" fill="#7986cb"/>
+  <!-- Lignes du carnet -->
+  <line x1="22" y1="26" x2="44" y2="26" stroke="#e0e0e0" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="22" y1="34" x2="44" y2="34" stroke="#e0e0e0" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="22" y1="42" x2="36" y2="42" stroke="#e0e0e0" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Initiale T -->
+  <text x="21" y="24" font-family="'Segoe UI', sans-serif" font-weight="900" font-size="11" fill="#3f51b5">T</text>
+  <!-- Coche verte -->
+  <circle cx="44" cy="44" r="11" fill="#43a047"/>
+  <polyline points="38,44 42,48 50,39" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
+
