@@ -1,0 +1,98 @@
+{
+  "configVersion": 1,
+  "timestamp": 1776774044131,
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/chunk-2XFAKNNS.js",
+        "/chunk-OTXSTSCU.js",
+        "/favicon.ico",
+        "/favicon.svg",
+        "/index.html",
+        "/main-5YWT5NAM.js",
+        "/manifest.webmanifest",
+        "/styles-44OXCKFR.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/icons/icon-128x128.png",
+        "/icons/icon-144x144.png",
+        "/icons/icon-152x152.png",
+        "/icons/icon-192x192.png",
+        "/icons/icon-384x384.png",
+        "/icons/icon-512x512.png",
+        "/icons/icon-72x72.png",
+        "/icons/icon-96x96.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "material-fonts",
+      "patterns": [
+        "https:\\/\\/fonts\\.googleapis\\.com\\/.*",
+        "https:\\/\\/fonts\\.gstatic\\.com\\/.*"
+      ],
+      "strategy": "performance",
+      "maxSize": 20,
+      "maxAge": 2592000000,
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "version": 1
+    }
+  ],
+  "hashTable": {
+    "/chunk-2XFAKNNS.js": "ad21ace4f2b10affc0fb866489f7c3f949cc55f1",
+    "/chunk-OTXSTSCU.js": "0d37c70e7dd9ca2a4e830dfa4733963a2607a406",
+    "/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
+    "/favicon.svg": "89a09eb46365692e1b6a2d6724f7643d77d44821",
+    "/icons/icon-128x128.png": "6c5470a9c740cadf83c1b965ffea97a51753befc",
+    "/icons/icon-144x144.png": "b2a7fc1fb9a097cf3a6fb0e1611f8e2d2eb25529",
+    "/icons/icon-152x152.png": "442b6e0a8100be301445deb70da740d7d5654089",
+    "/icons/icon-192x192.png": "5fe3247e93bf55e53fa0c63ec5e5687aa8d57992",
+    "/icons/icon-384x384.png": "dd031b6448ffaba95d7344caeccc95335e8ce6c3",
+    "/icons/icon-512x512.png": "d5bc1e4c974c78e7887f9026f819ff7f4dbf9f97",
+    "/icons/icon-72x72.png": "d28a7ccb2a79570bd0cd56bbe84d7edb555117a7",
+    "/icons/icon-96x96.png": "970824d1c6677b777213ab07adbf4b5da7825c82",
+    "/index.html": "d2ae958b4a0edeebc2de7795ab070cd0a338560e",
+    "/main-5YWT5NAM.js": "a6d468887dcdc9dab91489171400ca1e0f0b9421",
+    "/manifest.webmanifest": "781576358211a49fe26608dc359eb4406eaf0a4a",
+    "/styles-44OXCKFR.css": "34fea764391154f54c248530f5f681c4009480bb"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
