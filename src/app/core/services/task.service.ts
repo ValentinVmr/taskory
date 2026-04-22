@@ -133,11 +133,27 @@ export class TaskService {
 
   updateTask(task: Task): void {
     this.storage.saveTask(task);
-    // Supprimer les copies reportées uniquement si la tâche est terminée
     if (task.state === TaskState.DONE) {
+      // Supprimer les copies reportées si la tâche est terminée
       this._deleteDownstreamCopies(task.id);
+    } else {
+      // Propager le changement d'état aux copies reportées
+      this._propagateStateToDownstreamCopies(task);
     }
     this._tasks.update(ts => ts.map(t => (t.id === task.id ? task : t)));
+  }
+
+  /**
+   * Propage récursivement le changement d'état aux copies reportées (carriedFromId).
+   */
+  private _propagateStateToDownstreamCopies(task: Task): void {
+    const allTasks = Object.values(this.storage.getData().tasks);
+    const copies = allTasks.filter(t => t.carriedFromId === task.id);
+    copies.forEach(copy => {
+      const updatedCopy: Task = { ...copy, state: task.state, endDate: task.endDate };
+      this.storage.saveTask(updatedCopy);
+      this._propagateStateToDownstreamCopies(updatedCopy);
+    });
   }
 
   /**
