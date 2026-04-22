@@ -133,7 +133,25 @@ export class TaskService {
 
   updateTask(task: Task): void {
     this.storage.saveTask(task);
+    // Propager le nouvel état à toutes les copies reportées dans la chaîne
+    this._propagateStateToChain(task);
     this._tasks.update(ts => ts.map(t => (t.id === task.id ? task : t)));
+  }
+
+  /**
+   * Propage l'état (et endDate) d'une tâche à toutes ses copies reportées (carriedFromId).
+   * Cela garantit que si on passe la tâche originale en DONE, les copies des jours suivants
+   * reflètent aussi ce changement.
+   */
+  private _propagateStateToChain(updatedTask: Task): void {
+    const allTasks = Object.values(this.storage.getData().tasks);
+    const copies = allTasks.filter(t => t.carriedFromId === updatedTask.id);
+    copies.forEach(copy => {
+      const updatedCopy: Task = { ...copy, state: updatedTask.state, endDate: updatedTask.endDate };
+      this.storage.saveTask(updatedCopy);
+      // Propager récursivement si la copie a elle-même des copies
+      this._propagateStateToChain(updatedCopy);
+    });
   }
 
   deleteTask(id: string): void {
