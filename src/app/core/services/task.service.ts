@@ -133,24 +133,24 @@ export class TaskService {
 
   updateTask(task: Task): void {
     this.storage.saveTask(task);
-    // Propager le nouvel état à toutes les copies reportées dans la chaîne
-    this._propagateStateToChain(task);
+    // Supprimer les copies reportées uniquement si la tâche est terminée
+    if (task.state === TaskState.DONE) {
+      this._deleteDownstreamCopies(task.id);
+    }
     this._tasks.update(ts => ts.map(t => (t.id === task.id ? task : t)));
   }
 
   /**
-   * Propage l'état (et endDate) d'une tâche à toutes ses copies reportées (carriedFromId).
-   * Cela garantit que si on passe la tâche originale en DONE, les copies des jours suivants
-   * reflètent aussi ce changement.
+   * Supprime récursivement toutes les copies reportées (carriedFromId) d'une tâche.
+   * Cela garantit que si on change l'état de la tâche originale, les copies des jours
+   * suivants sont supprimées (elles seront recréées si nécessaire au prochain loadDay).
    */
-  private _propagateStateToChain(updatedTask: Task): void {
+  private _deleteDownstreamCopies(taskId: string): void {
     const allTasks = Object.values(this.storage.getData().tasks);
-    const copies = allTasks.filter(t => t.carriedFromId === updatedTask.id);
+    const copies = allTasks.filter(t => t.carriedFromId === taskId);
     copies.forEach(copy => {
-      const updatedCopy: Task = { ...copy, state: updatedTask.state, endDate: updatedTask.endDate };
-      this.storage.saveTask(updatedCopy);
-      // Propager récursivement si la copie a elle-même des copies
-      this._propagateStateToChain(updatedCopy);
+      this._deleteDownstreamCopies(copy.id); // récursif en profondeur d'abord
+      this.storage.deleteTask(copy.id);
     });
   }
 
