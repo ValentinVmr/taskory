@@ -132,46 +132,33 @@ import { SettingsDialogComponent } from './settings-dialog.component';
             <div class="sky">
               <div class="sun-wrap">
                 <div class="sun"></div>
-                <div class="sun-ray" *ngFor="let r of sunRays; let i = index"
-                  [style.transform]="'rotate(' + (i * 45) + 'deg)'"></div>
               </div>
               <div class="cloud cloud-1"></div>
               <div class="cloud cloud-2"></div>
             </div>
             <!-- Mer -->
-            <div class="sea">
-              <div class="sea-wave wave-a"></div>
-              <div class="sea-wave wave-b"></div>
-            </div>
+            <div class="sea"></div>
             <!-- Sable -->
             <div class="sand">
               <!-- Palmier SVG -->
-              <svg class="palm-svg" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-                <!-- Tronc -->
-                <path class="trunk" d="M58 155 Q52 120 56 90 Q58 60 60 20" stroke="#8d6e45" stroke-width="10"
-                  stroke-linecap="round" fill="none"/>
-                <!-- Noix de coco -->
-                <circle class="coconut" cx="60" cy="26" r="5" fill="#5d4037"/>
-                <circle class="coconut" cx="53" cy="22" r="4.5" fill="#6d4c41"/>
-                <!-- Feuille 1 - gauche haut -->
-                <path class="leaf leaf-1" d="M60 20 Q30 5 5 18" stroke="#388e3c" stroke-width="4"
-                  stroke-linecap="round" fill="none"/>
-                <path class="leaf leaf-1" d="M60 20 Q38 8 22 22" stroke="#43a047" stroke-width="2.5"
-                  stroke-linecap="round" fill="none" opacity="0.7"/>
-                <!-- Feuille 2 - droite haut -->
-                <path class="leaf leaf-2" d="M60 20 Q90 5 115 18" stroke="#388e3c" stroke-width="4"
-                  stroke-linecap="round" fill="none"/>
-                <path class="leaf leaf-2" d="M60 20 Q82 8 98 22" stroke="#43a047" stroke-width="2.5"
-                  stroke-linecap="round" fill="none" opacity="0.7"/>
-                <!-- Feuille 3 - haut -->
-                <path class="leaf leaf-3" d="M60 20 Q60 -10 45 -20" stroke="#2e7d32" stroke-width="4"
-                  stroke-linecap="round" fill="none"/>
-                <!-- Feuille 4 - gauche bas -->
-                <path class="leaf leaf-4" d="M60 24 Q28 28 10 50" stroke="#388e3c" stroke-width="3.5"
-                  stroke-linecap="round" fill="none"/>
-                <!-- Feuille 5 - droite bas -->
-                <path class="leaf leaf-5" d="M60 24 Q92 28 110 50" stroke="#388e3c" stroke-width="3.5"
-                  stroke-linecap="round" fill="none"/>
+              <svg class="palm-svg" viewBox="0 0 120 170" xmlns="http://www.w3.org/2000/svg">
+                <!-- Tout le palmier pivote ensemble depuis la base du tronc -->
+                <g class="palm-group">
+                  <!-- Tronc -->
+                  <path d="M58 155 Q52 120 56 90 Q58 60 60 20" stroke="#8d6e45" stroke-width="10"
+                    stroke-linecap="round" fill="none"/>
+                  <!-- Noix de coco -->
+                  <circle cx="60" cy="26" r="5" fill="#5d4037"/>
+                  <circle cx="53" cy="22" r="4.5" fill="#6d4c41"/>
+                  <!-- Feuilles avec animation secondaire relative au groupe -->
+                  <path class="leaf leaf-1" d="M60 20 Q30 5 5 18" stroke="#388e3c" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <path class="leaf leaf-1" d="M60 20 Q38 8 22 22" stroke="#43a047" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+                  <path class="leaf leaf-2" d="M60 20 Q90 5 115 18" stroke="#388e3c" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <path class="leaf leaf-2" d="M60 20 Q82 8 98 22" stroke="#43a047" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+                  <path class="leaf leaf-3" d="M60 20 Q55 -5 42 -15" stroke="#2e7d32" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <path class="leaf leaf-4" d="M60 24 Q28 28 10 50" stroke="#388e3c" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                  <path class="leaf leaf-5" d="M60 24 Q92 28 110 50" stroke="#388e3c" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+                </g>
               </svg>
             </div>
           </div>
@@ -356,18 +343,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       position: relative;
       overflow: hidden;
     }
-    .sea-wave {
-      position: absolute;
-      width: 200%;
-      height: 24px;
-      background: rgba(255,255,255,0.22);
-      border-radius: 50%;
-      top: 0;
-    }
-    .wave-a { left: -50%; animation: wave-roll 4s ease-in-out infinite; }
-    .wave-b { left: -100%; animation: wave-roll 4s ease-in-out infinite 2s; opacity: 0.6; }
-
-    /* Sand */
+    @keyframes drift {
     .sand {
       height: 100px;
       background: linear-gradient(180deg, #ffe082 0%, #ffca28 100%);
@@ -381,52 +357,46 @@ import { SettingsDialogComponent } from './settings-dialog.component';
     /* Palm SVG */
     .palm-svg {
       width: 120px;
-      height: 160px;
+      height: 170px;
       position: absolute;
       bottom: 50px;
       left: 60px;
     }
 
-    .trunk {
-      animation: sway-trunk 3.5s ease-in-out infinite;
+    /* Tout le palmier pivote depuis la base du tronc */
+    .palm-group {
+      animation: sway-palm 3.5s ease-in-out infinite;
       transform-origin: 58px 155px;
     }
-    .coconut { animation: sway-trunk 3.5s ease-in-out infinite; transform-origin: 58px 155px; }
 
-    .leaf-1 { animation: sway-leaf 3.5s ease-in-out infinite 0.1s; transform-origin: 60px 20px; }
-    .leaf-2 { animation: sway-leaf-r 3.5s ease-in-out infinite 0.2s; transform-origin: 60px 20px; }
-    .leaf-3 { animation: sway-leaf 3.5s ease-in-out infinite 0s; transform-origin: 60px 20px; }
-    .leaf-4 { animation: sway-leaf 3.5s ease-in-out infinite 0.3s; transform-origin: 60px 24px; }
-    .leaf-5 { animation: sway-leaf-r 3.5s ease-in-out infinite 0.15s; transform-origin: 60px 24px; }
+    /* Les feuilles ont un léger mouvement secondaire autour du sommet du tronc */
+    .leaf-1 { animation: sway-leaf   2.8s ease-in-out infinite 0.1s; transform-origin: 60px 20px; }
+    .leaf-2 { animation: sway-leaf-r 2.8s ease-in-out infinite 0.2s; transform-origin: 60px 20px; }
+    .leaf-3 { animation: sway-leaf   3.1s ease-in-out infinite 0s;   transform-origin: 60px 20px; }
+    .leaf-4 { animation: sway-leaf   3.3s ease-in-out infinite 0.3s; transform-origin: 60px 24px; }
+    .leaf-5 { animation: sway-leaf-r 3.3s ease-in-out infinite 0.15s;transform-origin: 60px 24px; }
 
     /* Animations */
     @keyframes pulse-sun {
       0%, 100% { box-shadow: 0 0 0 8px #ffca2840, 0 0 0 18px #ffca2820; }
       50%       { box-shadow: 0 0 0 14px #ffca2840, 0 0 0 28px #ffca2818; }
     }
-    @keyframes spin-rays {
-      from { transform: rotate(0deg) translateX(28px); }
-      to   { transform: rotate(360deg) translateX(28px); }
-    }
     @keyframes drift {
       from { transform: translateX(-80px); }
       to   { transform: translateX(360px); }
     }
-    @keyframes wave-roll {
-      0%   { transform: translateX(0) scaleY(1); }
-      50%  { transform: translateX(25%) scaleY(1.4); }
-      100% { transform: translateX(50%) scaleY(1); }
+    /* Balancement principal du palmier entier */
+    @keyframes sway-palm {
+      0%, 100% { transform: rotate(-5deg); }
+      50%       { transform: rotate(5deg); }
     }
-    @keyframes sway-trunk {
-      0%, 100% { transform: rotate(-4deg); }
-      50%       { transform: rotate(4deg); }
-    }
+    /* Balancement secondaire des feuilles (amplitude plus faible) */
     @keyframes sway-leaf {
-      0%, 100% { transform: rotate(-6deg); }
+      0%, 100% { transform: rotate(-4deg); }
       50%       { transform: rotate(3deg); }
     }
     @keyframes sway-leaf-r {
-      0%, 100% { transform: rotate(6deg); }
+      0%, 100% { transform: rotate(4deg); }
       50%       { transform: rotate(-3deg); }
     }
 
@@ -514,19 +484,8 @@ export class JournalComponent implements OnDestroy {
 
   loadingAi = signal(false);
   private _forceWork = signal(false);
-  private _shortcutsDismissed = signal(false);
   private _shortcutsPanelOpen = signal(false);
 
-  /** Tableau juste pour *ngFor des rayons du soleil */
-  sunRays = Array(8);
-
-  showShortcutsHint() {
-    return !this._shortcutsDismissed();
-  }
-
-  dismissShortcutsHint() {
-    this._shortcutsDismissed.set(true);
-  }
 
   toggleShortcutsPanel() {
     this._shortcutsPanelOpen.set(!this._shortcutsPanelOpen());
