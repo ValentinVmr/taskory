@@ -343,7 +343,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       position: relative;
       overflow: hidden;
     }
-    @keyframes drift {
+
     .sand {
       height: 100px;
       background: linear-gradient(180deg, #ffe082 0%, #ffca28 100%);
@@ -370,11 +370,11 @@ import { SettingsDialogComponent } from './settings-dialog.component';
     }
 
     /* Les feuilles ont un léger mouvement secondaire autour du sommet du tronc */
-    .leaf-1 { animation: sway-leaf   2.8s ease-in-out infinite 0.1s; transform-origin: 60px 20px; }
-    .leaf-2 { animation: sway-leaf-r 2.8s ease-in-out infinite 0.2s; transform-origin: 60px 20px; }
-    .leaf-3 { animation: sway-leaf   3.1s ease-in-out infinite 0s;   transform-origin: 60px 20px; }
-    .leaf-4 { animation: sway-leaf   3.3s ease-in-out infinite 0.3s; transform-origin: 60px 24px; }
-    .leaf-5 { animation: sway-leaf-r 3.3s ease-in-out infinite 0.15s;transform-origin: 60px 24px; }
+    .leaf-1 { animation: sway-leaf   2.8s ease-in-out infinite 0.1s;  transform-origin: 60px 20px; }
+    .leaf-2 { animation: sway-leaf-r 2.8s ease-in-out infinite 0.2s;  transform-origin: 60px 20px; }
+    .leaf-3 { animation: sway-leaf   3.1s ease-in-out infinite 0s;    transform-origin: 60px 20px; }
+    .leaf-4 { animation: sway-leaf   3.3s ease-in-out infinite 0.3s;  transform-origin: 60px 24px; }
+    .leaf-5 { animation: sway-leaf-r 3.3s ease-in-out infinite 0.15s; transform-origin: 60px 24px; }
 
     /* Animations */
     @keyframes pulse-sun {
@@ -419,8 +419,6 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       display: inline-block;
     }
     .shortcuts-btn {
-      padding: 0;
-      min-width: 0;
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -428,9 +426,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       transition: background 0.3s;
     }
-    .shortcuts-btn:hover {
-      background: #e5e7eb;
-    }
+    .shortcuts-btn:hover { background: #e5e7eb; }
 
     .shortcuts-panel {
       position: absolute;
@@ -455,10 +451,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       color: #333;
       margin-bottom: 8px;
     }
-    .sp-title-icon {
-      font-size: 18px;
-      color: #667eea;
-    }
+    .sp-title-icon { font-size: 18px; color: #667eea; }
     .sp-row {
       display: flex;
       align-items: center;
@@ -474,6 +467,36 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       font-size: 0.85rem;
       box-shadow: 0 1px 0 #ccc;
     }
+
+    /* ── Responsive ── */
+    @media (max-width: 500px) {
+      .journal-container { padding: 10px 8px; }
+
+      .date-title { font-size: 1.1rem; }
+
+      .actions-bar {
+        gap: 6px;
+      }
+      /* Résumé / Supprimer passent sur une 2e ligne, taille réduite */
+      .ai-btn, .delete-all-btn {
+        font-size: 0.78rem;
+        padding: 0 8px;
+      }
+      .delete-all-btn { margin-left: 0; }
+
+      .stats-bar { gap: 8px; font-size: 0.78rem; }
+      .stat { padding: 3px 8px; }
+
+      /* Beach scene pleine largeur sur mobile */
+      .beach-scene { width: 100%; border-radius: 12px; }
+
+      .shortcuts-panel {
+        right: auto;
+        left: 0;
+        width: 200px;
+      }
+    }
+
   `],
 })
 export class JournalComponent implements OnDestroy {
