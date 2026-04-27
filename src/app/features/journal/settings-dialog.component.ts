@@ -9,9 +9,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { StorageService } from '../../core/services/storage.service';
 import { LLM_PROVIDERS, LlmProviderDef } from '../../core/services/ai-summary.service';
-import { LlmProvider } from '../../core/models/task.model';
+import { LlmProvider, DEFAULT_WORKING_DAYS } from '../../core/models/task.model';
 
 @Component({
   selector: 'app-settings-dialog',
@@ -19,7 +20,7 @@ import { LlmProvider } from '../../core/models/task.model';
   imports: [
     CommonModule, ReactiveFormsModule, MatDialogModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatButtonModule, MatIconModule, MatDividerModule, MatSlideToggleModule,
+    MatButtonModule, MatIconModule, MatDividerModule, MatSlideToggleModule, MatCheckboxModule,
   ],
   template: `
     <div class="settings-header">
@@ -103,6 +104,22 @@ import { LlmProvider } from '../../core/models/task.model';
 
         </ng-container>
 
+        <mat-divider class="divider"></mat-divider>
+
+        <!-- Jours ouvrés -->
+        <p class="section-label">
+          <mat-icon class="section-icon">date_range</mat-icon>
+          Jours ouvrés
+        </p>
+        <div class="working-days-grid">
+          <mat-checkbox
+            *ngFor="let day of weekDays"
+            [checked]="isWorkingDay(day.value)"
+            (change)="toggleWorkingDay(day.value, $event.checked)"
+            color="primary"
+          >{{ day.label }}</mat-checkbox>
+        </div>
+
       </form>
     </mat-dialog-content>
 
@@ -137,6 +154,17 @@ import { LlmProvider } from '../../core/models/task.model';
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: #888;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-icon { font-size: 16px; width: 16px; height: 16px; }
+
+    .working-days-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px 4px;
     }
 
     .provider-grid {
@@ -241,6 +269,30 @@ export class SettingsDialogComponent implements OnInit {
   providers = LLM_PROVIDERS;
   showKey = false;
 
+  weekDays = [
+    { value: 1, label: 'Lun' },
+    { value: 2, label: 'Mar' },
+    { value: 3, label: 'Mer' },
+    { value: 4, label: 'Jeu' },
+    { value: 5, label: 'Ven' },
+    { value: 6, label: 'Sam' },
+    { value: 0, label: 'Dim' },
+  ];
+
+  private _workingDays: number[] = [...DEFAULT_WORKING_DAYS];
+
+  isWorkingDay(day: number): boolean {
+    return this._workingDays.includes(day);
+  }
+
+  toggleWorkingDay(day: number, checked: boolean): void {
+    if (checked) {
+      if (!this._workingDays.includes(day)) this._workingDays.push(day);
+    } else {
+      this._workingDays = this._workingDays.filter(d => d !== day);
+    }
+  }
+
   form = this.fb.group({
     enabled: [false],
     provider: ['openai' as LlmProvider, Validators.required],
@@ -257,6 +309,7 @@ export class SettingsDialogComponent implements OnInit {
     if (saved) {
       this.form.patchValue({ ...saved, enabled: saved.enabled ?? false });
     }
+    this._workingDays = [...this.storage.getWorkingDaysConfig()];
   }
 
   selectProvider(p: LlmProviderDef): void {
@@ -271,6 +324,7 @@ export class SettingsDialogComponent implements OnInit {
       apiKey: v.apiKey || '',
       enabled: v.enabled ?? false,
     });
+    this.storage.setWorkingDaysConfig(this._workingDays);
     this.dialogRef.close(true);
   }
 }

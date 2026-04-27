@@ -13,6 +13,11 @@ export interface LlmConfig {
   enabled: boolean;
 }
 
+/** Jours ouvrés : tableau de numéros de jours JS (0=Dim, 1=Lun, …, 6=Sam) */
+export type WorkingDaysConfig = number[];
+
+export const DEFAULT_WORKING_DAYS: WorkingDaysConfig = [1, 2, 3, 4, 5]; // Lun-Ven
+
 export interface Task {
   id: string;
   description: string;
@@ -36,5 +41,6 @@ export interface AppStorage {
   tasks: Record<string, Task>;
   pages: Record<string, JournalPage>;
   llmConfig?: LlmConfig;
+  workingDaysConfig?: WorkingDaysConfig;
 }
 

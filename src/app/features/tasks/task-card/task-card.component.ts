@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Task, TaskState } from '../../../core/models/task.model';
 import { LocalDatePipe } from '../../../core/pipes/local-date.pipe';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component';
+import { StorageService } from '../../../core/services/storage.service';
 
 @Component({
   selector: 'app-task-card',
@@ -214,6 +215,7 @@ export class TaskCardComponent {
   @Output() edit = new EventEmitter<Task>();
 
   private dialog = inject(MatDialog);
+  private storage = inject(StorageService);
 
   get duration(): number {
     if (!this.task.startDate || !this.task.endDate) return 0;
@@ -236,12 +238,12 @@ export class TaskCardComponent {
 
   private _countWorkingDays(start: Date, end: Date): number {
     if (end <= start) return 0;
+    const workingDays = this.storage.getWorkingDaysConfig();
     let count = 0;
     const cur = new Date(start);
     cur.setDate(cur.getDate() + 1); // on ne compte pas le jour de début
     while (cur <= end) {
-      const day = cur.getDay();
-      if (day !== 0 && day !== 6) count++; // 0=dim, 6=sam
+      if (workingDays.includes(cur.getDay())) count++;
       cur.setDate(cur.getDate() + 1);
     }
     return count;

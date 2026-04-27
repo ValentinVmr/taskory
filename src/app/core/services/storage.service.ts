@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AppStorage, JournalPage, LlmConfig, Task } from '../models/task.model';
+import { AppStorage, JournalPage, LlmConfig, Task, WorkingDaysConfig, DEFAULT_WORKING_DAYS } from '../models/task.model';
 
 const STORAGE_KEY = 'todo-plus-data';
 
@@ -96,6 +96,15 @@ export class StorageService {
 
   setLlmConfig(config: LlmConfig): void {
     this.data.llmConfig = config;
+    this.save();
+  }
+
+  getWorkingDaysConfig(): WorkingDaysConfig {
+    return this.data.workingDaysConfig ?? DEFAULT_WORKING_DAYS;
+  }
+
+  setWorkingDaysConfig(config: WorkingDaysConfig): void {
+    this.data.workingDaysConfig = config;
     this.save();
   }
 
