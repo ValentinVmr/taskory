@@ -58,23 +58,55 @@ export class TaskService {
     this.storage.savePage({ date, taskIds: [] });
   }
 
+  /** Remonte la chaîne carriedFromId pour trouver l'ID de la tâche racine. */
+  private _getRootTaskId(taskId: string): string {
+    let current = this.storage.getTask(taskId);
+    const visited = new Set<string>();
+    while (current?.carriedFromId && !visited.has(current.id)) {
+      visited.add(current.id);
+      const parent = this.storage.getTask(current.carriedFromId);
+      if (!parent) break;
+      current = parent;
+    }
+    return current?.id ?? taskId;
+  }
+
   /**
    * Synchronise les carry-overs : trouve les tâches incomplètes du dernier jour
    * précédent et les ajoute à la page courante si elles n'y sont pas déjà.
-   * Utilise carriedFromId pour éviter les doublons.
+   * Utilise l'ID racine pour éviter les doublons même en cas de chaînes multi-jours.
    */
   private _syncCarryOvers(date: string): void {
     const page = this.storage.getPage(date)!;
+
+    // Purge des doublons éventuellement déjà stockés (même ID racine → garder le premier)
+    const seenRootIds = new Set<string>();
+    const dedupedTaskIds: string[] = [];
+    for (const id of page.taskIds) {
+      const task = this.storage.getTask(id);
+      if (!task) continue;
+      const rootId = this._getRootTaskId(id);
+      if (seenRootIds.has(rootId)) {
+        this.storage.deleteTask(id); // supprime le doublon
+      } else {
+        seenRootIds.add(rootId);
+        dedupedTaskIds.push(id);
+      }
+    }
+    if (dedupedTaskIds.length !== page.taskIds.length) {
+      page.taskIds = dedupedTaskIds;
+      this.storage.savePage(page);
+    }
+
     const lastPage = this._findLastPageBefore(date);
     if (!lastPage) return;
 
-    // IDs déjà portés dans cette page (via carriedFromId)
-    const alreadyCarriedFromIds = new Set(
+    // IDs racines déjà représentés dans cette page
+    const alreadyCarriedRootIds = new Set(
       page.taskIds
         .map(id => this.storage.getTask(id))
         .filter((t): t is Task => !!t)
-        .map(t => t.carriedFromId)
-        .filter((id): id is string => !!id)
+        .map(t => this._getRootTaskId(t.id))
     );
 
     const incompleteTasks = lastPage.taskIds
@@ -83,7 +115,8 @@ export class TaskService {
 
     let changed = false;
     incompleteTasks.forEach((originalTask, index) => {
-      if (alreadyCarriedFromIds.has(originalTask.id)) return; // déjà reportée
+      const rootId = this._getRootTaskId(originalTask.id);
+      if (alreadyCarriedRootIds.has(rootId)) return; // déjà représentée (même chaîne)
 
       const carriedTask: Task = {
         ...originalTask,
