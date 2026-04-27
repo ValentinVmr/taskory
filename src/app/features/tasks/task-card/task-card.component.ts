@@ -7,7 +7,6 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Task, TaskState } from '../../../core/models/task.model';
 import { LocalDatePipe } from '../../../core/pipes/local-date.pipe';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component';
-import { StorageService } from '../../../core/services/storage.service';
 
 @Component({
   selector: 'app-task-card',
@@ -50,10 +49,6 @@ import { StorageService } from '../../../core/services/storage.service';
           <span class="date-chip done-date" *ngIf="task.endDate">
             <mat-icon class="date-icon">check_circle</mat-icon>
             Terminé le : {{ task.endDate | localDate }}
-          </span>
-          <span class="date-chip duration-chip" *ngIf="task.state === 'DONE' && task.endDate">
-            <mat-icon class="date-icon">schedule</mat-icon>
-            {{ duration }} jour{{ duration > 1 ? 's' : '' }}
           </span>
         </div>
       </div>
@@ -194,11 +189,6 @@ import { StorageService } from '../../../core/services/storage.service';
       font-weight: 500;
     }
 
-    .date-chip.duration-chip {
-      color: #6a1b9a;
-      font-weight: 500;
-    }
-
     /* Actions */
     .task-actions {
       display: flex;
@@ -215,39 +205,6 @@ export class TaskCardComponent {
   @Output() edit = new EventEmitter<Task>();
 
   private dialog = inject(MatDialog);
-  private storage = inject(StorageService);
-
-  get duration(): number {
-    if (!this.task.startDate || !this.task.endDate) return 0;
-    const start = new Date(this.task.startDate + 'T00:00:00');
-    const end = new Date(this.task.endDate + 'T00:00:00');
-
-    // Compte les jours ouvrés (lun-ven) entre start et end (inclus)
-    const workingDays = this._countWorkingDays(start, end);
-    if (workingDays <= 0) return 0;
-
-    // Paliers : 0, 0.125, 0.25, 0.5, 0.75, 1, puis 0.5 par 0.5
-    const fixedSteps = [0, 0.125, 0.25, 0.5, 0.75, 1];
-    if (workingDays <= 1) {
-      return fixedSteps.reduce((prev, curr) =>
-        Math.abs(curr - workingDays) < Math.abs(prev - workingDays) ? curr : prev
-      );
-    }
-    return Math.round(workingDays * 2) / 2;
-  }
-
-  private _countWorkingDays(start: Date, end: Date): number {
-    if (end <= start) return 0;
-    const workingDays = this.storage.getWorkingDaysConfig();
-    let count = 0;
-    const cur = new Date(start);
-    cur.setDate(cur.getDate() + 1); // on ne compte pas le jour de début
-    while (cur <= end) {
-      if (workingDays.includes(cur.getDay())) count++;
-      cur.setDate(cur.getDate() + 1);
-    }
-    return count;
-  }
 
   get stateClass() {
     const map: Record<TaskState, string> = {

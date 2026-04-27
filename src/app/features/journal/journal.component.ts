@@ -64,7 +64,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       </div>
 
       <!-- Actions Bar -->
-      <div class="actions-bar">
+      <div class="actions-bar" *ngIf="!isNonWorkingDay()">
         <button mat-raised-button color="primary" (click)="openAddTask()">
           <mat-icon>add</mat-icon>
           Nouvelle tâche
@@ -93,7 +93,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
       </div>
 
       <!-- Stats Bar -->
-      <div class="stats-bar">
+      <div class="stats-bar" *ngIf="!isNonWorkingDay()">
         <span class="stat todo">📌 {{ countTodo() }} à faire</span>
         <span class="stat in-progress">🔄 {{ countInProgress() }} en cours</span>
         <span class="stat done">✅ {{ countDone() }} terminées</span>
@@ -101,12 +101,36 @@ import { SettingsDialogComponent } from './settings-dialog.component';
 
       <!-- Task List -->
       <app-task-list
+        *ngIf="!isNonWorkingDay(); else restDay"
         [tasks]="taskService.tasks()"
         (taskUpdated)="onTaskUpdated($event)"
         (taskDeleted)="onTaskDeleted($event)"
         (taskEdit)="openEditTask($event)"
         (reordered)="onReordered($event)"
       />
+
+      <!-- Jour non ouvré -->
+      <ng-template #restDay>
+        <div class="rest-day">
+          <div class="palm-scene">
+            <div class="palm-tree">
+              <div class="palm-trunk"></div>
+              <div class="palm-leaves">
+                <div class="leaf leaf-1">🌴</div>
+              </div>
+            </div>
+            <div class="sun">☀️</div>
+            <div class="wave wave-1">🌊</div>
+            <div class="wave wave-2">🌊</div>
+          </div>
+          <h2 class="rest-title">{{ restMessage() }}</h2>
+          <p class="rest-sub">Profitez-en, vous le méritez ! 🍹</p>
+          <button mat-stroked-button class="force-btn" (click)="forceWorkMode()">
+            <mat-icon>work</mat-icon>
+            J'insiste, je travaille aujourd'hui
+          </button>
+        </div>
+      </ng-template>
     </div>
   `,
   styles: [`
@@ -211,6 +235,103 @@ import { SettingsDialogComponent } from './settings-dialog.component';
     .stat.todo { background: #f5f5f5; }
     .stat.in-progress { background: #fff8e1; }
     .stat.done { background: #e8f5e9; }
+
+    /* Jour non ouvré */
+    .rest-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .palm-scene {
+      position: relative;
+      width: 200px;
+      height: 160px;
+      margin-bottom: 8px;
+    }
+
+    .sun {
+      position: absolute;
+      top: 0;
+      right: 20px;
+      font-size: 2.5rem;
+      animation: spin-slow 8s linear infinite;
+    }
+
+    .palm-tree {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .palm-trunk {
+      width: 14px;
+      height: 80px;
+      background: linear-gradient(to right, #a0704a, #c8935a);
+      margin: 0 auto;
+      border-radius: 4px;
+      transform-origin: bottom center;
+      animation: sway 3s ease-in-out infinite;
+    }
+
+    .palm-leaves {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      transform-origin: bottom center;
+      animation: sway 3s ease-in-out infinite;
+    }
+
+    .leaf { font-size: 3.5rem; line-height: 1; }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      font-size: 2rem;
+    }
+    .wave-1 { left: 0; animation: wave 2.5s ease-in-out infinite; }
+    .wave-2 { right: 0; animation: wave 2.5s ease-in-out infinite 1.25s; }
+
+    @keyframes sway {
+      0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+      50%       { transform: translateX(-50%) rotate(5deg); }
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .rest-title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #e65100;
+    }
+
+    .rest-sub {
+      margin: 0;
+      color: #888;
+      font-size: 1rem;
+    }
+
+    .force-btn {
+      border-color: #bdbdbd !important;
+      color: #757575 !important;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
   `],
 })
 export class JournalComponent {
@@ -220,6 +341,35 @@ export class JournalComponent {
   private dialog = inject(MatDialog);
 
   loadingAi = signal(false);
+  private _forceWork = signal(false);
+
+  private readonly REST_MESSAGES = [
+    "C'est le week-end, lâchez le clavier ! 🏖️",
+    "Repos obligatoire — les bugs peuvent attendre ! 🛌",
+    "Aujourd'hui, votre seule mission : ne rien faire. 🌴",
+    "Ferme Taskory. Ouvre le frigo. 🍕",
+    "Mode vacances activé automatiquement. 🌞",
+    "Aucune tâche n'est prévue... sauf profiter. 🎉",
+    "Connexion refusée : jour de repos détecté. 🚫💻",
+  ];
+
+  isNonWorkingDay(): boolean {
+    if (this._forceWork()) return false;
+    const date = new Date(this.taskService.currentDate() + 'T12:00:00');
+    const workingDays = this.storageService.getWorkingDaysConfig();
+    return !workingDays.includes(date.getDay());
+  }
+
+  restMessage(): string {
+    const date = this.taskService.currentDate();
+    // Message déterministe selon la date
+    const idx = date.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % this.REST_MESSAGES.length;
+    return this.REST_MESSAGES[idx];
+  }
+
+  forceWorkMode(): void {
+    this._forceWork.set(true);
+  }
 
   aiEnabled() {
     return this.storageService.getLlmConfig()?.enabled ?? false;
@@ -245,16 +395,19 @@ export class JournalComponent {
   prevDay() {
     const d = new Date(this.taskService.currentDate() + 'T12:00:00');
     d.setDate(d.getDate() - 1);
+    this._forceWork.set(false);
     this.taskService.loadDay(d.toISOString().slice(0, 10));
   }
 
   nextDay() {
     const d = new Date(this.taskService.currentDate() + 'T12:00:00');
     d.setDate(d.getDate() + 1);
+    this._forceWork.set(false);
     this.taskService.loadDay(d.toISOString().slice(0, 10));
   }
 
   goToToday() {
+    this._forceWork.set(false);
     this.taskService.loadDay(new Date().toISOString().slice(0, 10));
   }
 

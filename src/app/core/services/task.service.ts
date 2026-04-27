@@ -267,13 +267,21 @@ export class TaskService {
 
   getPreviousDayTasks(): Task[] {
     const date = this._currentDate();
-    const prev = new Date(date);
-    prev.setDate(prev.getDate() - 1);
-    const prevPage = this.storage.getPage(formatDate(prev));
-    if (!prevPage) return [];
-    return prevPage.taskIds
-      .map(id => this.storage.getTask(id))
-      .filter((t): t is Task => !!t);
+    const workingDays = this.storage.getWorkingDaysConfig();
+
+    // Cherche le dernier jour ouvré avant la date courante (max 30 jours en arrière)
+    const cur = new Date(date + 'T12:00:00');
+    for (let i = 0; i < 30; i++) {
+      cur.setDate(cur.getDate() - 1);
+      if (!workingDays.includes(cur.getDay())) continue;
+      const prevPage = this.storage.getPage(formatDate(cur));
+      if (prevPage && prevPage.taskIds.length > 0) {
+        return prevPage.taskIds
+          .map(id => this.storage.getTask(id))
+          .filter((t): t is Task => !!t);
+      }
+    }
+    return [];
   }
 }
 
