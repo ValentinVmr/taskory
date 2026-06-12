@@ -291,15 +291,29 @@ export class TaskService {
   }
 
   /**
-   * Recherche des tâches par description ou numéro de ticket
+   * Recherche des tâches par description ou numéro de ticket.
+   * Retourne uniquement les tâches sources (racines) pour éviter
+   * d'afficher les copies reportées des jours suivants.
    */
   searchTasks(query: string): Task[] {
-    const lowerQuery = query.toLowerCase();
+    const lowerQuery = query.toLowerCase().trim();
+    if (!lowerQuery) return [];
+
     const allTasks = Object.values(this.storage.getData().tasks);
-    return allTasks.filter(task => {
+    const rootById = new Map<string, Task>();
+
+    for (const task of allTasks) {
       const descMatch = task.description.toLowerCase().includes(lowerQuery);
-      const ticketMatch = task.ticketNumber?.toLowerCase().includes(lowerQuery);
-      return descMatch || ticketMatch;
-    });
+      const ticketMatch = task.ticketNumber?.toLowerCase().includes(lowerQuery) ?? false;
+      if (!descMatch && !ticketMatch) continue;
+
+      const rootId = this._getRootTaskId(task.id);
+      const rootTask = this.storage.getTask(rootId);
+      if (rootTask) {
+        rootById.set(rootId, rootTask);
+      }
+    }
+
+    return Array.from(rootById.values()).sort((a, b) => b.startDate.localeCompare(a.startDate));
   }
 }

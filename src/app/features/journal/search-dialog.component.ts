@@ -56,7 +56,7 @@ import { Task, TaskState } from '../../core/models/task.model';
                 {{ formatDate(task.startDate) }}
               </div>
             </div>
-            <mat-icon matListItemMeta>chevron_right</mat-icon>
+            <mat-icon class="result-chevron" aria-hidden="true">chevron_right</mat-icon>
           </mat-list-item>
         </mat-list>
       </div>
@@ -103,12 +103,18 @@ import { Task, TaskState } from '../../core/models/task.model';
     .result-item {
       cursor: pointer;
       transition: background-color 0.2s;
-      padding: 0 !important;
+      padding: 0 8px !important;
       margin: 0 !important;
+      min-height: 72px;
 
       &:hover {
         background-color: #f5f5f5;
       }
+    }
+
+    .result-chevron {
+      color: #9e9e9e;
+      flex-shrink: 0;
     }
 
     .result-content {

@@ -54,7 +54,7 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
             </span>
           </div>
 
-          <!-- Actions - visible au survol -->
+          <!-- Actions -->
           <div class="task-actions">
             <button mat-icon-button *ngIf="task.state !== 'CANCELLED'" (click)="cancelTask()" matTooltip="Annuler" class="action-btn">
               <mat-icon>block</mat-icon>
@@ -219,30 +219,38 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
       font-weight: 500;
     }
 
-    /* Actions - visible au survol */
+    /* Actions */
     .task-actions {
       display: flex;
       gap: 2px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      flex-shrink: 0;
-    }
-
-    .task-card:hover .task-actions {
       opacity: 1;
+      flex-shrink: 0;
     }
 
     .action-btn {
       width: 32px;
       height: 32px;
-      line-height: 32px;
+      min-width: 32px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .action-btn:hover {
+      background: rgba(0, 0, 0, 0.06);
     }
 
     .action-btn mat-icon {
+      margin: 0;
       font-size: 18px;
       width: 18px;
       height: 18px;
       line-height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .action-danger:hover {
