@@ -39,35 +39,37 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
       <div class="task-content">
         <div class="task-header">
           <span class="ticket-badge" *ngIf="task.ticketNumber">#{{ task.ticketNumber }}</span>
-          <span class="carried-badge" *ngIf="task.carriedOver" matTooltip="Reportée du jour précédent">↩ Reportée</span>
+          <span class="carried-badge" *ngIf="task.carriedOver" matTooltip="Reportée du jour précédent">↩</span>
         </div>
         <p class="task-description" [class.done-text]="task.state === 'DONE' || task.state === 'CANCELLED'">{{ task.description }}</p>
-        <div class="task-dates">
-          <span class="date-chip">
-            <mat-icon class="date-icon">calendar_today</mat-icon>
-            Créé le : {{ task.startDate | localDate }}
-          </span>
-          <span class="date-chip done-date" *ngIf="task.endDate">
-            <mat-icon class="date-icon">check_circle</mat-icon>
-            {{ task.state === 'CANCELLED' ? 'Annulée le' : 'Terminée le' }} : {{ task.endDate | localDate }}
-          </span>
-        </div>
-      </div>
+        <div class="task-footer">
+          <div class="task-dates">
+            <span class="date-chip">
+              <mat-icon class="date-icon">calendar_today</mat-icon>
+              {{ task.startDate | localDate }}
+            </span>
+            <span class="date-chip done-date" *ngIf="task.endDate">
+              <mat-icon class="date-icon">check_circle</mat-icon>
+              {{ task.endDate | localDate }}
+            </span>
+          </div>
 
-      <!-- Actions -->
-      <div class="task-actions">
-        <button mat-icon-button *ngIf="task.state !== 'CANCELLED'" (click)="cancelTask()" matTooltip="Annuler la tâche" color="warn">
-          <mat-icon>block</mat-icon>
-        </button>
-        <button mat-icon-button *ngIf="task.state === 'CANCELLED'" (click)="reopenTask()" matTooltip="Réouvrir la tâche">
-          <mat-icon>replay</mat-icon>
-        </button>
-        <button mat-icon-button (click)="edit.emit(task)" matTooltip="Modifier">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button (click)="delete()" matTooltip="Supprimer" color="warn">
-          <mat-icon>delete</mat-icon>
-        </button>
+          <!-- Actions - visible au survol -->
+          <div class="task-actions">
+            <button mat-icon-button *ngIf="task.state !== 'CANCELLED'" (click)="cancelTask()" matTooltip="Annuler" class="action-btn">
+              <mat-icon>block</mat-icon>
+            </button>
+            <button mat-icon-button *ngIf="task.state === 'CANCELLED'" (click)="reopenTask()" matTooltip="Réouvrir" class="action-btn">
+              <mat-icon>replay</mat-icon>
+            </button>
+            <button mat-icon-button (click)="edit.emit(task)" matTooltip="Modifier" class="action-btn">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="delete()" matTooltip="Supprimer" class="action-btn action-danger">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -75,30 +77,30 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
     .task-card {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 12px;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
       background: #fff;
       border: 1.5px solid #e0e0e0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      transition: box-shadow 0.2s, border-color 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: all 0.2s;
     }
 
     .task-card:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12);
     }
 
-    .task-card.todo { border-left: 4px solid #bdbdbd; }
-    .task-card.in-progress { border-left: 4px solid #FFB300; background: #fffde7; }
-    .task-card.done { border-left: 4px solid #43a047; background: #f1f8e9; }
-    .task-card.cancelled { border-left: 4px solid #e53935; background: #ffebee; }
+    .task-card.todo { border-left: 3px solid #bdbdbd; }
+    .task-card.in-progress { border-left: 3px solid #FFB300; background: #fffef7; }
+    .task-card.done { border-left: 3px solid #43a047; background: #f8fbf6; }
+    .task-card.cancelled { border-left: 3px solid #e53935; background: #fff5f5; }
 
     /* Checkbox */
     .state-checkbox {
-      width: 28px;
-      height: 28px;
-      min-width: 28px;
-      border-radius: 6px;
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border-radius: 5px;
       border: 2px solid #bdbdbd;
       background: #fff;
       cursor: pointer;
@@ -108,7 +110,11 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
       transition: all 0.2s;
       padding: 0;
       flex-shrink: 0;
-      margin-top: 2px;
+      margin-top: 1px;
+    }
+
+    .state-checkbox:hover {
+      transform: scale(1.1);
     }
 
     .state-checkbox.in-progress {
@@ -127,48 +133,50 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
     }
 
     .checkbox-inner {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: bold;
       line-height: 1;
     }
 
-    .icon-todo { display: block; width: 10px; height: 10px; }
-    .icon-inprogress { color: #fff; font-size: 1rem; line-height: 1; }
-    .icon-done { color: #fff; font-size: 1rem; line-height: 1; }
-    .icon-cancelled { color: #fff; font-size: 0.9rem; line-height: 1; }
+    .icon-todo { display: block; width: 8px; height: 8px; }
+    .icon-inprogress { color: #fff; font-size: 0.9rem; line-height: 1; }
+    .icon-done { color: #fff; font-size: 0.9rem; line-height: 1; }
+    .icon-cancelled { color: #fff; font-size: 0.85rem; line-height: 1; }
 
     /* Content */
     .task-content { flex: 1; min-width: 0; }
 
     .task-header {
       display: flex;
-      gap: 8px;
-      margin-bottom: 4px;
+      gap: 6px;
+      margin-bottom: 3px;
       flex-wrap: wrap;
     }
 
     .ticket-badge {
       background: #e3f2fd;
       color: #1565c0;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 0.7rem;
       font-weight: 600;
+      line-height: 1.4;
     }
 
     .carried-badge {
       background: #fce4ec;
       color: #c62828;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
+      padding: 1px 5px;
+      border-radius: 10px;
+      font-size: 0.7rem;
       font-weight: 500;
+      line-height: 1.4;
     }
 
     .task-description {
       margin: 0 0 6px;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.4;
       word-break: break-word;
     }
 
@@ -177,14 +185,22 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
       color: #9e9e9e;
     }
 
+    .task-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
     .task-dates {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
+      flex: 1;
     }
 
     .date-chip {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #757575;
       display: flex;
       align-items: center;
@@ -192,9 +208,9 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
     }
 
     .date-icon {
-      font-size: 13px;
-      width: 13px;
-      height: 13px;
+      font-size: 12px;
+      width: 12px;
+      height: 12px;
       line-height: 1;
     }
 
@@ -203,12 +219,34 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
       font-weight: 500;
     }
 
-    /* Actions */
+    /* Actions - visible au survol */
     .task-actions {
       display: flex;
-      flex-direction: column;
-      gap: 0;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity 0.2s;
       flex-shrink: 0;
+    }
+
+    .task-card:hover .task-actions {
+      opacity: 1;
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+    }
+
+    .action-btn mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+    }
+
+    .action-danger:hover {
+      color: #d32f2f;
     }
   `],
 })
