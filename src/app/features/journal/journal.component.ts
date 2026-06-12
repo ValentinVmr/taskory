@@ -12,6 +12,7 @@ import { TaskFormComponent } from '../tasks/task-form/task-form.component';
 import { Task } from '../../core/models/task.model';
 import { ConfirmAllDeleteDialogComponent } from './confirm-all-delete-dialog.component';
 import { SettingsDialogComponent } from './settings-dialog.component';
+import { SearchDialogComponent } from './search-dialog.component';
 
 @Component({
   selector: 'app-journal',
@@ -68,6 +69,11 @@ import { SettingsDialogComponent } from './settings-dialog.component';
         <button mat-raised-button color="primary" (click)="openAddTask()">
           <mat-icon>add</mat-icon>
           Nouvelle tâche
+        </button>
+
+        <button mat-stroked-button (click)="openSearch()" aria-label="Rechercher" matTooltip="Rechercher un ticket (Ctrl+K)">
+          <mat-icon>search</mat-icon>
+          Rechercher
         </button>
 
         <button mat-stroked-button class="ai-btn" (click)="generateAiSummary()" [disabled]="loadingAi()">
@@ -553,6 +559,13 @@ export class JournalComponent implements OnDestroy {
       case 'N':
         if (!this.isNonWorkingDay()) this.openAddTask();
         break;
+      case 'k':
+      case 'K':
+        if ((event.ctrlKey || event.metaKey) && !this.isNonWorkingDay()) {
+          event.preventDefault();
+          this.openSearch();
+        }
+        break;
     }
   }
 
@@ -659,6 +672,20 @@ export class JournalComponent implements OnDestroy {
     });
     ref.afterClosed().subscribe(result => {
       if (result) this.taskService.addTask(result);
+    });
+  }
+
+  openSearch() {
+    const ref = this.dialog.open(SearchDialogComponent, {
+      width: '600px',
+    });
+    ref.afterClosed().subscribe(task => {
+      if (task) {
+        // Naviguer vers la date du ticket et le charger
+        this.taskService.loadDay(task.startDate);
+        this._forceWork.set(false);
+        this.clearSummary();
+      }
     });
   }
 

@@ -289,5 +289,17 @@ export class TaskService {
     }
     return [];
   }
-}
 
+  /**
+   * Recherche des tâches par description ou numéro de ticket
+   */
+  searchTasks(query: string): Task[] {
+    const lowerQuery = query.toLowerCase();
+    const allTasks = Object.values(this.storage.getData().tasks);
+    return allTasks.filter(task => {
+      const descMatch = task.description.toLowerCase().includes(lowerQuery);
+      const ticketMatch = task.ticketNumber?.toLowerCase().includes(lowerQuery);
+      return descMatch || ticketMatch;
+    });
+  }
+}
