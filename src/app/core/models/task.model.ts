@@ -2,6 +2,7 @@ export enum TaskState {
   TODO = 'TODO',
   IN_PROGRESS = 'IN_PROGRESS',
   DONE = 'DONE',
+  CANCELLED = 'CANCELLED',
 }
 
 export type LlmProvider = 'openai' | 'anthropic' | 'gemini' | 'mistral';

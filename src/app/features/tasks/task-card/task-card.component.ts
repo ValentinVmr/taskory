@@ -30,6 +30,7 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
             <span *ngSwitchCase="'TODO'" class="icon-todo"></span>
             <span *ngSwitchCase="'IN_PROGRESS'" class="icon-inprogress">—</span>
             <span *ngSwitchCase="'DONE'" class="icon-done">✓</span>
+            <span *ngSwitchCase="'CANCELLED'" class="icon-cancelled">✕</span>
           </ng-container>
         </span>
       </button>
@@ -40,7 +41,7 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
           <span class="ticket-badge" *ngIf="task.ticketNumber">#{{ task.ticketNumber }}</span>
           <span class="carried-badge" *ngIf="task.carriedOver" matTooltip="Reportée du jour précédent">↩ Reportée</span>
         </div>
-        <p class="task-description" [class.done-text]="task.state === 'DONE'">{{ task.description }}</p>
+        <p class="task-description" [class.done-text]="task.state === 'DONE' || task.state === 'CANCELLED'">{{ task.description }}</p>
         <div class="task-dates">
           <span class="date-chip">
             <mat-icon class="date-icon">calendar_today</mat-icon>
@@ -48,13 +49,19 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
           </span>
           <span class="date-chip done-date" *ngIf="task.endDate">
             <mat-icon class="date-icon">check_circle</mat-icon>
-            Terminé le : {{ task.endDate | localDate }}
+            {{ task.state === 'CANCELLED' ? 'Annulée le' : 'Terminée le' }} : {{ task.endDate | localDate }}
           </span>
         </div>
       </div>
 
       <!-- Actions -->
       <div class="task-actions">
+        <button mat-icon-button *ngIf="task.state !== 'CANCELLED'" (click)="cancelTask()" matTooltip="Annuler la tâche" color="warn">
+          <mat-icon>block</mat-icon>
+        </button>
+        <button mat-icon-button *ngIf="task.state === 'CANCELLED'" (click)="reopenTask()" matTooltip="Réouvrir la tâche">
+          <mat-icon>replay</mat-icon>
+        </button>
         <button mat-icon-button (click)="edit.emit(task)" matTooltip="Modifier">
           <mat-icon>edit</mat-icon>
         </button>
@@ -84,6 +91,7 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
     .task-card.todo { border-left: 4px solid #bdbdbd; }
     .task-card.in-progress { border-left: 4px solid #FFB300; background: #fffde7; }
     .task-card.done { border-left: 4px solid #43a047; background: #f1f8e9; }
+    .task-card.cancelled { border-left: 4px solid #e53935; background: #ffebee; }
 
     /* Checkbox */
     .state-checkbox {
@@ -113,6 +121,11 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
       background: #43a047;
     }
 
+    .state-checkbox.cancelled {
+      border-color: #e53935;
+      background: #e53935;
+    }
+
     .checkbox-inner {
       font-size: 0.9rem;
       font-weight: bold;
@@ -122,6 +135,7 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
     .icon-todo { display: block; width: 10px; height: 10px; }
     .icon-inprogress { color: #fff; font-size: 1rem; line-height: 1; }
     .icon-done { color: #fff; font-size: 1rem; line-height: 1; }
+    .icon-cancelled { color: #fff; font-size: 0.9rem; line-height: 1; }
 
     /* Content */
     .task-content { flex: 1; min-width: 0; }
@@ -211,6 +225,7 @@ export class TaskCardComponent {
       [TaskState.TODO]: 'todo',
       [TaskState.IN_PROGRESS]: 'in-progress',
       [TaskState.DONE]: 'done',
+      [TaskState.CANCELLED]: 'cancelled',
     };
     return map[this.task.state];
   }
@@ -220,6 +235,7 @@ export class TaskCardComponent {
       [TaskState.TODO]: 'À faire — cliquer pour En cours',
       [TaskState.IN_PROGRESS]: 'En cours — cliquer pour Terminé',
       [TaskState.DONE]: 'Terminé — cliquer pour À faire',
+      [TaskState.CANCELLED]: 'Annulée — cliquer pour Réouvrir',
     };
     return map[this.task.state];
   }
@@ -229,11 +245,21 @@ export class TaskCardComponent {
       [TaskState.TODO]: TaskState.IN_PROGRESS,
       [TaskState.IN_PROGRESS]: TaskState.DONE,
       [TaskState.DONE]: TaskState.TODO,
+      [TaskState.CANCELLED]: TaskState.TODO,
     };
     const nextState = next[this.task.state];
     const today = new Date().toISOString().slice(0, 10);
     const endDate = nextState === TaskState.DONE ? today : '';
     this.stateChanged.emit({ ...this.task, state: nextState, endDate });
+  }
+
+  cancelTask() {
+    const today = new Date().toISOString().slice(0, 10);
+    this.stateChanged.emit({ ...this.task, state: TaskState.CANCELLED, endDate: today });
+  }
+
+  reopenTask() {
+    this.stateChanged.emit({ ...this.task, state: TaskState.TODO, endDate: '' });
   }
 
   delete() {

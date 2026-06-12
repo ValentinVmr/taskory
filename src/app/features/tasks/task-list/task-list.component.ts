@@ -71,6 +71,27 @@ import { TaskCardComponent } from '../task-card/task-card.component';
         </app-task-card>
       </ng-container>
 
+      <!-- Séparateur -->
+      <div class="group-divider" *ngIf="cancelled().length > 0 && (done().length > 0 || todo().length > 0 || inProgress().length > 0)"></div>
+
+      <!-- Bloc CANCELLED -->
+      <ng-container *ngIf="cancelled().length > 0">
+        <div class="group-header cancelled-header">
+          <span class="group-dot"></span>
+          ⛔ Annulées <span class="group-count">({{ cancelled().length }})</span>
+        </div>
+        <app-task-card
+          *ngFor="let task of cancelled(); trackBy: trackById"
+          [task]="task"
+          cdkDrag
+          (stateChanged)="taskUpdated.emit($event)"
+          (deleted)="taskDeleted.emit($event)"
+          (edit)="taskEdit.emit($event)"
+        >
+          <div class="drag-handle" cdkDragHandle><span class="drag-dots">⠿</span></div>
+        </app-task-card>
+      </ng-container>
+
       <!-- État vide -->
       <div class="empty-state" *ngIf="tasks.length === 0">
         🎉 Aucune tâche pour cette journée.<br>Cliquez sur "Nouvelle tâche" pour commencer !
@@ -109,6 +130,7 @@ import { TaskCardComponent } from '../task-card/task-card.component';
     .in-progress-header .group-dot { background: #FFB300; }
     .todo-header .group-dot { background: #bdbdbd; }
     .done-header .group-dot { background: #43a047; }
+    .cancelled-header .group-dot { background: #e53935; }
 
     .group-divider {
       border: none;
@@ -151,6 +173,7 @@ export class TaskListComponent {
   inProgress() { return this.tasks.filter(t => t.state === TaskState.IN_PROGRESS); }
   todo()       { return this.tasks.filter(t => t.state === TaskState.TODO); }
   done()       { return this.tasks.filter(t => t.state === TaskState.DONE); }
+  cancelled()  { return this.tasks.filter(t => t.state === TaskState.CANCELLED); }
 
   trackById(_: number, t: Task) { return t.id; }
 

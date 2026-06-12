@@ -111,6 +111,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
         <span class="stat todo">📌 {{ countTodo() }} à faire</span>
         <span class="stat in-progress">🔄 {{ countInProgress() }} en cours</span>
         <span class="stat done">✅ {{ countDone() }} terminées</span>
+        <span class="stat cancelled">⛔ {{ countCancelled() }} annulées</span>
       </div>
 
       <!-- Task List -->
@@ -252,6 +253,7 @@ import { SettingsDialogComponent } from './settings-dialog.component';
     .stat.todo { background: #f5f5f5; }
     .stat.in-progress { background: #fff8e1; }
     .stat.done { background: #e8f5e9; }
+    .stat.cancelled { background: #ffebee; }
 
     /* ── Rest day ── */
     .rest-day {
@@ -630,6 +632,7 @@ export class JournalComponent implements OnDestroy {
   countTodo()       { return this.taskService.tasks().filter(t => t.state === 'TODO').length; }
   countInProgress() { return this.taskService.tasks().filter(t => t.state === 'IN_PROGRESS').length; }
   countDone()       { return this.taskService.tasks().filter(t => t.state === 'DONE').length; }
+  countCancelled()  { return this.taskService.tasks().filter(t => t.state === 'CANCELLED').length; }
 
   /* ── AI Summary ── */
   async generateAiSummary() {

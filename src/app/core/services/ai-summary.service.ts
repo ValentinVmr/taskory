@@ -231,6 +231,7 @@ export class AiSummaryService {
     const done = this.sortByTicket(tasks.filter(t => t.state === TaskState.DONE));
     const inProgress = this.sortByTicket(tasks.filter(t => t.state === TaskState.IN_PROGRESS));
     const todo = this.sortByTicket(tasks.filter(t => t.state === TaskState.TODO));
+    const cancelled = this.sortByTicket(tasks.filter(t => t.state === TaskState.CANCELLED));
     const lines: string[] = [];
     if (done.length > 0) {
       lines.push(`\n✅ Terminé (${done.length}) :`);
@@ -243,6 +244,10 @@ export class AiSummaryService {
     if (todo.length > 0) {
       lines.push(`\n📌 Non démarré (${todo.length}) :`);
       todo.forEach(t => lines.push(`  • ${t.ticketNumber ? `[${t.ticketNumber}] ` : ''}${t.description}`));
+    }
+    if (cancelled.length > 0) {
+      lines.push(`\n⛔ Annulé (${cancelled.length}) :`);
+      cancelled.forEach(t => lines.push(`  • ${t.ticketNumber ? `[${t.ticketNumber}] ` : ''}${t.description}`));
     }
     if (tasks.length === 0) lines.push('Aucune tâche enregistrée pour la journée précédente.');
     return lines.join('\n');

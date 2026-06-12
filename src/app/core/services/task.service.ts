@@ -14,6 +14,7 @@ const STATE_ORDER: Record<TaskState, number> = {
   [TaskState.IN_PROGRESS]: 0,
   [TaskState.TODO]: 1,
   [TaskState.DONE]: 2,
+  [TaskState.CANCELLED]: 3,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -111,7 +112,7 @@ export class TaskService {
 
     const incompleteTasks = lastPage.taskIds
       .map(id => this.storage.getTask(id))
-      .filter((t): t is Task => !!t && t.state !== TaskState.DONE);
+      .filter((t): t is Task => !!t && t.state !== TaskState.DONE && t.state !== TaskState.CANCELLED);
 
     let changed = false;
     incompleteTasks.forEach((originalTask, index) => {
@@ -166,8 +167,8 @@ export class TaskService {
 
   updateTask(task: Task): void {
     this.storage.saveTask(task);
-    if (task.state === TaskState.DONE) {
-      // Supprimer les copies reportées si la tâche est terminée
+    if (task.state === TaskState.DONE || task.state === TaskState.CANCELLED) {
+      // Supprimer les copies reportées si la tâche est dans un état clos
       this._deleteDownstreamCopies(task.id);
     } else {
       // Propager le changement d'état aux copies reportées
@@ -227,6 +228,7 @@ export class TaskService {
       [TaskState.TODO]: TaskState.IN_PROGRESS,
       [TaskState.IN_PROGRESS]: TaskState.DONE,
       [TaskState.DONE]: TaskState.TODO,
+      [TaskState.CANCELLED]: TaskState.TODO,
     };
     const nextState = next[task.state];
     const endDate = nextState === TaskState.DONE ? formatDate(new Date()) : '';
@@ -238,6 +240,10 @@ export class TaskService {
       // Arriver en PREMIER du groupe DONE
       const doneOrders = currentTasks.filter(t => t.state === TaskState.DONE && t.id !== task.id).map(t => t.order);
       newOrder = doneOrders.length > 0 ? Math.min(...doneOrders) - 1 : 0;
+    } else if (nextState === TaskState.CANCELLED) {
+      // Arriver en DERNIER du groupe CANCELLED
+      const cancelledOrders = currentTasks.filter(t => t.state === TaskState.CANCELLED && t.id !== task.id).map(t => t.order);
+      newOrder = cancelledOrders.length > 0 ? Math.max(...cancelledOrders) + 1 : 0;
     } else if (nextState === TaskState.IN_PROGRESS) {
       // Arriver en DERNIER du groupe IN_PROGRESS
       const ipOrders = currentTasks.filter(t => t.state === TaskState.IN_PROGRESS && t.id !== task.id).map(t => t.order);
