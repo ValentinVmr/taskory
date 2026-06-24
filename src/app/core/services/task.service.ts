@@ -316,4 +316,69 @@ export class TaskService {
 
     return Array.from(rootById.values()).sort((a, b) => b.startDate.localeCompare(a.startDate));
   }
+
+  getRootTasksForExport(): Task[] {
+    const allTasks = Object.values(this.storage.getData().tasks);
+    const rootById = new Map<string, Task>();
+
+    for (const task of allTasks) {
+      const rootId = this._getRootTaskId(task.id);
+      const rootTask = this.storage.getTask(rootId);
+      if (rootTask) {
+        rootById.set(rootTask.id, rootTask);
+      }
+    }
+
+    return Array.from(rootById.values())
+      .sort((a, b) => {
+        const dateDiff = a.startDate.localeCompare(b.startDate);
+        if (dateDiff !== 0) return dateDiff;
+        return a.order - b.order;
+      });
+  }
+
+  getRootTasksForExportCount(): number {
+    return this.getRootTasksForExport().length;
+  }
+
+  exportAllTasksAsJson(): string {
+    return JSON.stringify(this.getRootTasksForExport(), null, 2);
+  }
+
+  exportAllTasksAsCsv(): string {
+    const headers = [
+      'id',
+      'description',
+      'state',
+      'startDate',
+      'endDate',
+      'ticketNumber',
+      'order',
+      'originDate',
+      'carriedOver',
+      'carriedFromId',
+    ];
+
+    const escapeCsv = (value: string | number | boolean | undefined): string => {
+      const safe = value ?? '';
+      const serialized = String(safe).replace(/\r?\n/g, ' ');
+      const escaped = serialized.replace(/"/g, '""');
+      return `"${escaped}"`;
+    };
+
+    const rows = this.getRootTasksForExport().map(task => [
+      escapeCsv(task.id),
+      escapeCsv(task.description),
+      escapeCsv(task.state),
+      escapeCsv(task.startDate),
+      escapeCsv(task.endDate),
+      escapeCsv(task.ticketNumber),
+      escapeCsv(task.order),
+      escapeCsv(task.originDate),
+      escapeCsv(task.carriedOver),
+      escapeCsv(task.carriedFromId),
+    ].join(','));
+
+    return [headers.join(','), ...rows].join('\n');
+  }
 }

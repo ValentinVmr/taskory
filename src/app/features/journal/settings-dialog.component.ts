@@ -11,6 +11,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { StorageService } from '../../core/services/storage.service';
+import { TaskService } from '../../core/services/task.service';
 import { LLM_PROVIDERS, LlmProviderDef } from '../../core/services/ai-summary.service';
 import { LlmProvider, DEFAULT_WORKING_DAYS } from '../../core/models/task.model';
 
@@ -120,6 +121,24 @@ import { LlmProvider, DEFAULT_WORKING_DAYS } from '../../core/models/task.model'
           >{{ day.label }}</mat-checkbox>
         </div>
 
+        <mat-divider class="divider"></mat-divider>
+
+        <p class="section-label">
+          <mat-icon class="section-icon">download</mat-icon>
+          Export des tâches
+        </p>
+        <div class="export-actions">
+          <button mat-stroked-button type="button" (click)="exportTasks('json')" [disabled]="allTaskCount() === 0">
+            <mat-icon>data_object</mat-icon>
+            Export JSON
+          </button>
+          <button mat-stroked-button type="button" (click)="exportTasks('csv')" [disabled]="allTaskCount() === 0">
+            <mat-icon>table_view</mat-icon>
+            Export CSV
+          </button>
+          <span class="export-count">{{ allTaskCount() }} tâche(s) disponible(s)</span>
+        </div>
+
       </form>
     </mat-dialog-content>
 
@@ -165,6 +184,19 @@ import { LlmProvider, DEFAULT_WORKING_DAYS } from '../../core/models/task.model'
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 6px 4px;
+    }
+
+    .export-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .export-count {
+      font-size: 0.8rem;
+      color: #666;
+      margin-left: auto;
     }
 
     .provider-grid {
@@ -264,6 +296,7 @@ import { LlmProvider, DEFAULT_WORKING_DAYS } from '../../core/models/task.model'
 export class SettingsDialogComponent implements OnInit {
   dialogRef = inject(MatDialogRef<SettingsDialogComponent>);
   private storage = inject(StorageService);
+  private taskService = inject(TaskService);
   private fb = inject(FormBuilder);
 
   providers = LLM_PROVIDERS;
@@ -326,6 +359,31 @@ export class SettingsDialogComponent implements OnInit {
     });
     this.storage.setWorkingDaysConfig(this._workingDays);
     this.dialogRef.close(true);
+  }
+
+  allTaskCount(): number {
+    return this.taskService.getRootTasksForExportCount();
+  }
+
+  exportTasks(format: 'json' | 'csv'): void {
+    const count = this.allTaskCount();
+    if (count === 0) return;
+
+    const today = new Date().toISOString().slice(0, 10);
+    const baseName = `todo-plus-tasks-${today}`;
+    const content = format === 'json'
+      ? this.taskService.exportAllTasksAsJson()
+      : this.taskService.exportAllTasksAsCsv();
+    const mimeType = format === 'json' ? 'application/json;charset=utf-8' : 'text/csv;charset=utf-8';
+    const extension = format === 'json' ? 'json' : 'csv';
+
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${baseName}.${extension}`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 }
 
