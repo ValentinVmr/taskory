@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Task } from '../../../core/models/task.model';
+import { formatCommaSeparatedValues, normalizeCommaSeparatedValues, parseCommaSeparatedValues } from '../../../core/utils/comma-separated-values.util';
 
 interface DialogData {
   task?: Task;
@@ -47,9 +48,10 @@ interface DialogData {
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>N° de ticket (optionnel)</mat-label>
-          <input matInput formControlName="ticketNumber" placeholder="ex: PROJ-123" />
+          <mat-label>N° de ticket / tags (optionnel)</mat-label>
+          <input matInput formControlName="ticketNumber" placeholder="ex: PROJ-123, urgent, backend" />
           <mat-icon matPrefix>confirmation_number</mat-icon>
+          <mat-hint>Séparez plusieurs tags avec des virgules.</mat-hint>
         </mat-form-field>
       </form>
     </mat-dialog-content>
@@ -100,7 +102,7 @@ export class TaskFormComponent {
   ) {
     this.form = this.fb.group({
       description: [this.data.task?.description || '', Validators.required],
-      ticketNumber: [this.data.task?.ticketNumber || ''],
+      ticketNumber: [formatCommaSeparatedValues(parseCommaSeparatedValues(this.data.task?.ticketNumber))],
     });
   }
 
@@ -109,7 +111,7 @@ export class TaskFormComponent {
       const v = this.form.value;
       this.dialogRef.close({
         description: v['description'],
-        ticketNumber: v['ticketNumber'] || undefined,
+        ticketNumber: normalizeCommaSeparatedValues(v['ticketNumber']),
       });
     }
   }

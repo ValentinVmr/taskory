@@ -9,6 +9,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { TaskService } from '../../core/services/task.service';
 import { Task, TaskState } from '../../core/models/task.model';
+import { parseCommaSeparatedValues } from '../../core/utils/comma-separated-values.util';
 
 @Component({
   selector: 'app-search-dialog',
@@ -48,7 +49,14 @@ import { Task, TaskState } from '../../core/models/task.model';
           <mat-list-item *ngFor="let task of searchResults()" class="result-item" (click)="selectTask(task)">
             <div class="result-content">
               <div class="result-ticket">
-                <strong>{{ task.ticketNumber || 'Sans numéro' }}</strong>
+                <ng-container *ngIf="ticketNumbers(task).length > 0; else noTicketNumbers">
+                  <strong class="ticket-badges">
+                    <span class="ticket-badge" *ngFor="let ticket of ticketNumbers(task)">#{{ ticket }}</span>
+                  </strong>
+                </ng-container>
+                <ng-template #noTicketNumbers>
+                  <strong>Sans numéro</strong>
+                </ng-template>
               </div>
               <div class="result-description">{{ task.description }}</div>
               <div class="result-date">
@@ -130,6 +138,24 @@ import { Task, TaskState } from '../../core/models/task.model';
       font-size: 0.9rem;
       color: #667eea;
       min-height: 20px;
+    }
+
+    .ticket-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .ticket-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #e3f2fd;
+      color: #1565c0;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      line-height: 1.4;
     }
 
     .result-description {
@@ -214,6 +240,10 @@ export class SearchDialogComponent {
 
   selectTask(task: Task) {
     this.dialogRef.close(task);
+  }
+
+  ticketNumbers(task: Task): string[] {
+    return parseCommaSeparatedValues(task.ticketNumber);
   }
 
   cancel() {

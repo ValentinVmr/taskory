@@ -1,6 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { Task, TaskState, JournalPage } from '../models/task.model';
 import { StorageService } from './storage.service';
+import { normalizeCommaSeparatedValues } from '../utils/comma-separated-values.util';
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -154,7 +155,7 @@ export class TaskService {
       state: TaskState.TODO,
       startDate: date,       // date de création automatique
       endDate: '',           // vide jusqu'au passage en DONE
-      ticketNumber: data.ticketNumber,
+      ticketNumber: normalizeCommaSeparatedValues(data.ticketNumber),
       order: page.taskIds.length,
       originDate: date,
       carriedOver: false,
@@ -166,15 +167,20 @@ export class TaskService {
   }
 
   updateTask(task: Task): void {
-    this.storage.saveTask(task);
-    if (task.state === TaskState.DONE || task.state === TaskState.CANCELLED) {
+    const normalizedTask: Task = {
+      ...task,
+      ticketNumber: normalizeCommaSeparatedValues(task.ticketNumber),
+    };
+
+    this.storage.saveTask(normalizedTask);
+    if (normalizedTask.state === TaskState.DONE || normalizedTask.state === TaskState.CANCELLED) {
       // Supprimer les copies reportées si la tâche est dans un état clos
-      this._deleteDownstreamCopies(task.id);
+      this._deleteDownstreamCopies(normalizedTask.id);
     } else {
       // Propager le changement d'état aux copies reportées
-      this._propagateStateToDownstreamCopies(task);
+      this._propagateStateToDownstreamCopies(normalizedTask);
     }
-    this._tasks.update(ts => ts.map(t => (t.id === task.id ? task : t)));
+    this._tasks.update(ts => ts.map(t => (t.id === normalizedTask.id ? normalizedTask : t)));
   }
 
   /**

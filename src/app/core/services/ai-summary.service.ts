@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Task, TaskState, LlmConfig, LlmProvider } from '../models/task.model';
 import { StorageService } from './storage.service';
+import { formatCommaSeparatedValues, parseCommaSeparatedValues } from '../utils/comma-separated-values.util';
 
 export interface LlmProviderDef {
   id: LlmProvider;
@@ -143,7 +144,10 @@ export class AiSummaryService {
 
   private buildPrompt(tasks: Task[]): string {
     const sorted = this.sortByTicket(tasks);
-    const lines = sorted.map(t => `- ${t.ticketNumber ? `[${t.ticketNumber}] ` : ''}${t.description} (${t.state})`);
+    const lines = sorted.map(t => {
+      const ticketLabel = formatCommaSeparatedValues(parseCommaSeparatedValues(t.ticketNumber));
+      return `- ${ticketLabel ? `[${ticketLabel}] ` : ''}${t.description} (${t.state})`;
+    });
     return `Voici les tâches de la journée d'hier :\n${lines.join('\n')}\n\nRédige directement un résumé professionnel de cette journée en français, sans introduction ni formule de politesse, en 3 à 5 phrases. Va droit au but.`;
   }
 
@@ -235,19 +239,31 @@ export class AiSummaryService {
     const lines: string[] = [];
     if (done.length > 0) {
       lines.push(`\n✅ Terminé (${done.length}) :`);
-      done.forEach(t => lines.push(`  • ${t.ticketNumber ? `[${t.ticketNumber}] ` : ''}${t.description}`));
+      done.forEach(t => {
+        const ticketLabel = formatCommaSeparatedValues(parseCommaSeparatedValues(t.ticketNumber));
+        lines.push(`  • ${ticketLabel ? `[${ticketLabel}] ` : ''}${t.description}`);
+      });
     }
     if (inProgress.length > 0) {
       lines.push(`\n🔄 En cours (${inProgress.length}) :`);
-      inProgress.forEach(t => lines.push(`  • ${t.ticketNumber ? `[${t.ticketNumber}] ` : ''}${t.description}`));
+      inProgress.forEach(t => {
+        const ticketLabel = formatCommaSeparatedValues(parseCommaSeparatedValues(t.ticketNumber));
+        lines.push(`  • ${ticketLabel ? `[${ticketLabel}] ` : ''}${t.description}`);
+      });
     }
     if (todo.length > 0) {
       lines.push(`\n📌 Non démarré (${todo.length}) :`);
-      todo.forEach(t => lines.push(`  • ${t.ticketNumber ? `[${t.ticketNumber}] ` : ''}${t.description}`));
+      todo.forEach(t => {
+        const ticketLabel = formatCommaSeparatedValues(parseCommaSeparatedValues(t.ticketNumber));
+        lines.push(`  • ${ticketLabel ? `[${ticketLabel}] ` : ''}${t.description}`);
+      });
     }
     if (cancelled.length > 0) {
       lines.push(`\n⛔ Annulé (${cancelled.length}) :`);
-      cancelled.forEach(t => lines.push(`  • ${t.ticketNumber ? `[${t.ticketNumber}] ` : ''}${t.description}`));
+      cancelled.forEach(t => {
+        const ticketLabel = formatCommaSeparatedValues(parseCommaSeparatedValues(t.ticketNumber));
+        lines.push(`  • ${ticketLabel ? `[${ticketLabel}] ` : ''}${t.description}`);
+      });
     }
     if (tasks.length === 0) lines.push('Aucune tâche enregistrée pour la journée précédente.');
     return lines.join('\n');

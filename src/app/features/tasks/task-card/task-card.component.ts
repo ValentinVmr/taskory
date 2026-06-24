@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Task, TaskState } from '../../../core/models/task.model';
 import { LocalDatePipe } from '../../../core/pipes/local-date.pipe';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component';
+import { parseCommaSeparatedValues } from '../../../core/utils/comma-separated-values.util';
 
 @Component({
   selector: 'app-task-card',
@@ -38,7 +39,9 @@ import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog.component'
       <!-- Content -->
       <div class="task-content">
         <div class="task-header">
-          <span class="ticket-badge" *ngIf="task.ticketNumber">#{{ task.ticketNumber }}</span>
+          <ng-container *ngIf="ticketNumbers().length > 0">
+            <span class="ticket-badge" *ngFor="let ticket of ticketNumbers()">#{{ ticket }}</span>
+          </ng-container>
           <span class="carried-badge" *ngIf="task.carriedOver" matTooltip="Reportée du jour précédent">↩</span>
         </div>
         <p class="task-description" [class.done-text]="task.state === 'DONE' || task.state === 'CANCELLED'">{{ task.description }}</p>
@@ -284,6 +287,10 @@ export class TaskCardComponent {
       [TaskState.CANCELLED]: 'Annulée — cliquer pour Réouvrir',
     };
     return map[this.task.state];
+  }
+
+  ticketNumbers(): string[] {
+    return parseCommaSeparatedValues(this.task.ticketNumber);
   }
 
   cycleState() {
