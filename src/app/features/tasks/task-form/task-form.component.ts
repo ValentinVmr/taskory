@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Task } from '../../../core/models/task.model';
 import { formatCommaSeparatedValues, normalizeCommaSeparatedValues, parseCommaSeparatedValues } from '../../../core/utils/comma-separated-values.util';
 
@@ -25,6 +26,7 @@ interface DialogData {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatCheckboxModule,
   ],
   template: `
     <h2 mat-dialog-title>
@@ -53,6 +55,15 @@ interface DialogData {
           <mat-icon matPrefix>confirmation_number</mat-icon>
           <mat-hint>Séparez plusieurs tags avec des virgules.</mat-hint>
         </mat-form-field>
+
+        <mat-checkbox
+          *ngIf="!data.task"
+          formControlName="createAnother"
+          color="primary"
+          class="create-another-checkbox"
+        >
+          Créer une autre tâche juste après
+        </mat-checkbox>
       </form>
     </mat-dialog-content>
 
@@ -80,6 +91,11 @@ interface DialogData {
 
     .full-width { width: 100%; }
 
+    .create-another-checkbox {
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
     h2[mat-dialog-title] {
       display: flex;
       align-items: center;
@@ -103,6 +119,7 @@ export class TaskFormComponent {
     this.form = this.fb.group({
       description: [this.data.task?.description || '', Validators.required],
       ticketNumber: [formatCommaSeparatedValues(parseCommaSeparatedValues(this.data.task?.ticketNumber))],
+      createAnother: [false],
     });
   }
 
@@ -112,6 +129,7 @@ export class TaskFormComponent {
       this.dialogRef.close({
         description: v['description'],
         ticketNumber: normalizeCommaSeparatedValues(v['ticketNumber']),
+        createAnother: !!v['createAnother'],
       });
     }
   }

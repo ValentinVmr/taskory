@@ -671,7 +671,12 @@ export class JournalComponent implements OnDestroy {
       data: { date: this.taskService.currentDate() },
     });
     ref.afterClosed().subscribe(result => {
-      if (result) this.taskService.addTask(result);
+      if (result) {
+        this.taskService.addTask(result);
+        if (result.createAnother) {
+          this.openAddTask();
+        }
+      }
     });
   }
 
