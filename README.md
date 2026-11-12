@@ -2,6 +2,16 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
 
+## Interface
+
+The interface uses daisyUI and Tailwind CSS, with a custom `taskory` theme defined in
+`src/styles.scss` and PostCSS configured in `.postcssrc.json`. Angular Material provides
+the accessible dialog, tooltip, and icon infrastructure; Angular CDK handles task
+drag-and-drop. Tasks can also be reordered within their status group using the arrow
+keys on the focused drag handle. Fonts and icons are bundled and prefetched by the
+service worker so the interface remains usable offline. Their license texts are
+distributed under `licenses/manrope/` and `licenses/material-icons/` in the build.
+
 ## Development server
 
 To start a local development server, run:

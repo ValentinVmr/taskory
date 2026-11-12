@@ -1,0 +1,197 @@
+:host {
+  display: block;
+}
+
+.task-card {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 3px;
+  padding: 10px 12px 10px 6px;
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  background: var(--color-base-100);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.task-card:hover,
+.task-card:focus-within {
+  border-color: #cfd4e6;
+  box-shadow: 0 5px 16px rgba(37, 40, 58, 0.05);
+}
+
+.state-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.state-button:hover {
+  background: var(--surface-subtle);
+}
+
+.state-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #aeb4c3;
+  border-radius: 7px;
+  background: var(--color-base-100);
+}
+
+.state-indicator.in-progress {
+  border-color: #a56800;
+  background: #a56800;
+  color: #fff;
+}
+
+.state-indicator.done {
+  border-color: var(--status-done);
+  background: var(--status-done);
+  color: #fff;
+}
+
+.state-indicator.cancelled {
+  border-color: var(--status-cancelled);
+  background: var(--status-cancelled);
+  color: #fff;
+}
+
+.state-indicator mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
+.task-content {
+  flex: 1;
+  min-width: 0;
+  padding-top: 10px;
+}
+
+.task-description {
+  margin: 0;
+  color: var(--color-base-content);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.closed-text {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.task-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 9px;
+}
+
+.ticket-badge,
+.carried-badge {
+  height: auto;
+  max-width: 100%;
+  min-height: 23px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: 7px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.ticket-badge {
+  background: var(--color-secondary);
+  color: var(--color-secondary-content);
+}
+
+.carried-badge {
+  gap: 3px;
+  background: var(--status-progress-bg);
+  color: var(--status-progress);
+}
+
+.carried-badge mat-icon {
+  width: 13px;
+  height: 13px;
+  font-size: 13px;
+}
+
+.task-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin-top: 4px;
+}
+
+.task-dates {
+  display: flex;
+  flex: 1 1 180px;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  color: var(--text-muted);
+  font-size: 0.73rem;
+}
+
+.task-dates span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.task-dates mat-icon {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+}
+
+.task-actions {
+  display: flex;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.action-btn {
+  color: var(--text-muted);
+}
+
+.action-btn mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+.action-danger:hover {
+  color: var(--status-cancelled);
+}
+
+@media (max-width: 420px) {
+  .task-card {
+    gap: 0;
+    padding-right: 8px;
+    padding-left: 2px;
+  }
+
+  .task-actions {
+    margin-left: -8px;
+  }
+}

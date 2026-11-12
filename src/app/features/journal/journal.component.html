@@ -1,0 +1,310 @@
+<div class="app-shell">
+  <a class="skip-link" href="#journal-content">Aller au journal</a>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand" aria-label="Taskory, journal de bord">
+        <img class="brand-icon" src="icons/icon-72x72.png" alt="" width="42" height="42" />
+        <div class="brand-copy">
+          <span class="brand-name">Taskory<span class="brand-period">.</span></span>
+          <span class="brand-caption">VOTRE JOURNAL DE BORD</span>
+        </div>
+      </div>
+
+      <nav class="header-actions" aria-label="Actions du journal">
+        <button
+          class="btn btn-ghost header-search"
+          type="button"
+          (click)="openSearch()"
+          aria-label="Rechercher une tâche"
+          matTooltip="Rechercher (Ctrl+K)"
+        >
+          <mat-icon aria-hidden="true">search</mat-icon>
+          <span>Rechercher</span>
+          <kbd class="kbd search-shortcut">Ctrl K</kbd>
+        </button>
+
+        <div class="shortcuts-wrap">
+          <button
+            class="btn btn-ghost btn-square header-icon"
+            type="button"
+            (click)="toggleShortcutsPanel()"
+            aria-label="Raccourcis clavier"
+            [attr.aria-expanded]="shortcutsPanelOpen()"
+            aria-controls="shortcuts-panel"
+            matTooltip="Raccourcis clavier"
+          >
+            <mat-icon aria-hidden="true">keyboard</mat-icon>
+          </button>
+          <div
+            class="shortcuts-panel card"
+            id="shortcuts-panel"
+            *ngIf="shortcutsPanelOpen()"
+            role="region"
+            aria-label="Raccourcis clavier"
+          >
+            <p class="shortcuts-title">Raccourcis clavier</p>
+            <div class="shortcut-row"><span>Jour précédent</span><kbd class="kbd">←</kbd></div>
+            <div class="shortcut-row"><span>Jour suivant</span><kbd class="kbd">→</kbd></div>
+            <div class="shortcut-row"><span>Aujourd'hui</span><kbd class="kbd">T</kbd></div>
+            <div class="shortcut-row"><span>Nouvelle tâche</span><kbd class="kbd">N</kbd></div>
+            <div class="shortcut-row"><span>Rechercher</span><kbd class="kbd">Ctrl K</kbd></div>
+          </div>
+        </div>
+
+        <button
+          class="btn btn-ghost btn-square header-icon"
+          type="button"
+          (click)="openSettings()"
+          aria-label="Paramètres"
+          matTooltip="Paramètres"
+        >
+          <mat-icon aria-hidden="true">settings</mat-icon>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content" id="journal-content">
+    <div class="page-heading">
+      <div class="heading-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> VOTRE ESPACE PERSONNEL</p>
+        <div class="heading-title">
+          <p class="date-context">
+            {{ isToday() ? "Aujourd'hui" : isPast() ? 'Dans votre journal' : 'À venir' }}
+          </p>
+          <h1 aria-live="polite">{{ formattedDate() }}</h1>
+          <p class="heading-description">
+            {{
+              isNonWorkingDay()
+                ? 'Une journée pour prendre votre temps.'
+                : 'Un peu de clarté pour avancer, à votre rythme.'
+            }}
+          </p>
+        </div>
+      </div>
+
+      <div class="date-navigation" aria-label="Navigation entre les journées">
+        <div class="day-arrows">
+          <button
+            class="btn btn-ghost btn-square"
+            type="button"
+            (click)="prevDay()"
+            aria-label="Jour précédent"
+            matTooltip="Jour précédent (←)"
+          >
+            <mat-icon aria-hidden="true">chevron_left</mat-icon>
+          </button>
+          <button
+            class="btn btn-ghost btn-square"
+            type="button"
+            (click)="nextDay()"
+            aria-label="Jour suivant"
+            matTooltip="Jour suivant (→)"
+          >
+            <mat-icon aria-hidden="true">chevron_right</mat-icon>
+          </button>
+        </div>
+        <button
+          class="btn btn-ghost today-button"
+          type="button"
+          (click)="goToToday()"
+          [disabled]="isToday()"
+          matTooltip="Revenir à aujourd'hui (T)"
+        >
+          <mat-icon aria-hidden="true">today</mat-icon>
+          Aujourd'hui
+        </button>
+      </div>
+    </div>
+
+    <ng-container *ngIf="!isNonWorkingDay(); else restDay">
+      <div class="dashboard-grid">
+        <div class="main-column">
+          <section
+            class="summary-card card"
+            *ngIf="taskService.aiSummary()"
+            aria-labelledby="summary-title"
+          >
+            <div class="summary-heading">
+              <span class="summary-icon"><mat-icon aria-hidden="true">auto_awesome</mat-icon></span>
+              <div class="summary-title-group">
+                <p class="summary-kicker">UN REGARD EN ARRIÈRE</p>
+                <h2 id="summary-title">
+                  {{ aiEnabled() ? 'Résumé IA' : 'Résumé' }} de la journée précédente
+                </h2>
+              </div>
+              <div class="summary-actions">
+                <button
+                  class="btn btn-ghost btn-square"
+                  type="button"
+                  (click)="generateAiSummary()"
+                  [disabled]="loadingAi()"
+                  aria-label="Régénérer le résumé"
+                  matTooltip="Régénérer"
+                >
+                  <mat-icon aria-hidden="true">refresh</mat-icon>
+                </button>
+                <button
+                  class="btn btn-ghost btn-square"
+                  type="button"
+                  (click)="clearSummary()"
+                  aria-label="Fermer le résumé"
+                  matTooltip="Fermer"
+                >
+                  <mat-icon aria-hidden="true">close</mat-icon>
+                </button>
+              </div>
+            </div>
+            <pre class="summary-text">{{ taskService.aiSummary() }}</pre>
+          </section>
+
+          <section class="task-panel card" aria-labelledby="tasks-title">
+            <div class="task-panel-header">
+              <div>
+                <p class="panel-eyebrow">PLACE À L'ESSENTIEL</p>
+                <h2 id="tasks-title">Les tâches du jour</h2>
+                <p class="panel-description">
+                  {{ taskService.tasks().length }} tâche{{
+                    taskService.tasks().length === 1 ? '' : 's'
+                  }}
+                  dans votre journal
+                </p>
+              </div>
+              <button class="btn btn-primary add-button" type="button" (click)="openAddTask()">
+                <mat-icon aria-hidden="true">add</mat-icon>
+                Nouvelle tâche
+              </button>
+            </div>
+
+            <app-task-list
+              [tasks]="taskService.tasks()"
+              (taskUpdated)="onTaskUpdated($event)"
+              (taskDeleted)="onTaskDeleted($event)"
+              (taskEdit)="openEditTask($event)"
+              (reordered)="onReordered($event)"
+            />
+          </section>
+        </div>
+
+        <aside class="side-column" aria-label="Aperçu de la journée">
+          <section class="overview-card card" aria-labelledby="overview-title">
+            <p class="panel-eyebrow">EN UN COUP D'ŒIL</p>
+            <h2 id="overview-title">Votre journée</h2>
+            <p class="overview-description">Chaque petite étape compte.</p>
+
+            <div class="progress-heading">
+              <span>Progression</span>
+              <strong>{{ completionPercentage() }} %</strong>
+            </div>
+            <progress
+              class="progress progress-primary"
+              [value]="completionPercentage()"
+              max="100"
+              [attr.aria-label]="'Progression : ' + completionPercentage() + ' %'"
+            ></progress>
+            <p class="progress-caption">{{ countDone() }} / {{ countActive() }} tâches terminées</p>
+
+            <div class="overview-divider"></div>
+            <ul class="status-list">
+              <li>
+                <span><i class="status-dot progress-dot"></i> En cours</span
+                ><strong>{{ countInProgress() }}</strong>
+              </li>
+              <li>
+                <span><i class="status-dot todo-dot"></i> À faire</span
+                ><strong>{{ countTodo() }}</strong>
+              </li>
+              <li>
+                <span><i class="status-dot done-dot"></i> Terminées</span
+                ><strong>{{ countDone() }}</strong>
+              </li>
+              <li>
+                <span><i class="status-dot cancelled-dot"></i> Annulées</span
+                ><strong>{{ countCancelled() }}</strong>
+              </li>
+            </ul>
+          </section>
+
+          <section class="recap-card card" aria-labelledby="recap-title">
+            <span class="recap-icon"><mat-icon aria-hidden="true">auto_awesome</mat-icon></span>
+            <h2 id="recap-title">Faire le point</h2>
+            <p>Retrouvez l'essentiel de votre dernier jour travaillé.</p>
+            <button
+              class="btn btn-outline recap-button"
+              type="button"
+              (click)="generateAiSummary()"
+              [disabled]="loadingAi()"
+            >
+              <span
+                class="loading loading-spinner loading-xs"
+                *ngIf="loadingAi()"
+                aria-hidden="true"
+              ></span>
+              <mat-icon *ngIf="!loadingAi()" aria-hidden="true">summarize</mat-icon>
+              {{
+                loadingAi()
+                  ? 'Génération...'
+                  : aiEnabled()
+                    ? 'Générer le résumé IA'
+                    : 'Générer le résumé'
+              }}
+            </button>
+            <span class="sr-only" aria-live="polite" *ngIf="loadingAi()"
+              >Génération du résumé en cours.</span
+            >
+          </section>
+
+          <button
+            class="btn btn-ghost delete-all-button"
+            type="button"
+            (click)="deleteAll()"
+            [disabled]="taskService.tasks().length === 0"
+          >
+            <mat-icon aria-hidden="true">delete_outline</mat-icon>
+            Supprimer les tâches du jour
+          </button>
+        </aside>
+      </div>
+    </ng-container>
+
+    <ng-template #restDay>
+      <section class="rest-card card" aria-labelledby="rest-title">
+        <div class="rest-illustration" aria-hidden="true">
+          <svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="120" cy="90" r="77" fill="#eef0fc" />
+            <circle cx="120" cy="74" r="31" fill="#f5c978" />
+            <path d="M37 134c21-26 50-37 83-37s62 11 83 37" fill="#d8def6" />
+            <path d="M48 143c19-20 44-28 72-28s53 8 72 28" fill="#b9c3ed" />
+            <path
+              d="M78 83l-12-9m108 9 12-9M120 32V20"
+              stroke="#d7a552"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <path d="M87 153h66" stroke="#8e9ad3" stroke-width="4" stroke-linecap="round" />
+          </svg>
+        </div>
+        <p class="panel-eyebrow">JOUR NON OUVRÉ</p>
+        <h2 id="rest-title">Place à la pause.</h2>
+        <p class="rest-message">{{ restMessage() }}</p>
+        <p class="rest-description">
+          Cette journée n'est pas dans vos jours ouvrés. Vous pouvez tout de même ouvrir votre
+          journal si vous en avez besoin.
+        </p>
+        <button class="btn btn-primary" type="button" (click)="forceWorkMode()">
+          <mat-icon aria-hidden="true">edit_calendar</mat-icon>
+          Ouvrir cette journée
+        </button>
+      </section>
+    </ng-template>
+
+    <footer class="app-footer">
+      <span
+        ><mat-icon aria-hidden="true">lock_outline</mat-icon> Vos données sont enregistrées sur cet
+        appareil</span
+      >
+      <span>Un jour à la fois.</span>
+    </footer>
+  </main>
+</div>

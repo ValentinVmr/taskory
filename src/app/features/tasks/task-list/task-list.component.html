@@ -1,0 +1,45 @@
+<div class="task-list" cdkDropList (cdkDropListDropped)="onDrop($event)">
+  <ng-container *ngFor="let group of groups">
+    <ng-container *ngIf="tasksForState(group.state) as groupTasks">
+      <section class="task-group" *ngIf="groupTasks.length" [ngClass]="'group-' + group.className">
+        <h3 class="group-header">
+          <span class="group-dot" aria-hidden="true"></span>
+          {{ group.label }}
+          <span class="badge group-count">{{ groupTasks.length }}</span>
+        </h3>
+
+        <app-task-card
+          *ngFor="let task of groupTasks; trackBy: trackById"
+          [task]="task"
+          cdkDrag
+          [cdkDragData]="task"
+          (stateChanged)="taskUpdated.emit($event)"
+          (deleted)="taskDeleted.emit($event)"
+          (edit)="taskEdit.emit($event)"
+        >
+          <button
+            class="drag-handle"
+            type="button"
+            cdkDragHandle
+            [attr.aria-label]="
+              'Réordonner « ' + task.description + ' » avec les flèches haut et bas'
+            "
+            aria-keyshortcuts="ArrowUp ArrowDown"
+            title="Faire glisser ou utiliser les flèches haut et bas"
+            (keydown.arrowup)="moveTask(task, -1, $event)"
+            (keydown.arrowdown)="moveTask(task, 1, $event)"
+          >
+            <mat-icon aria-hidden="true">drag_indicator</mat-icon>
+          </button>
+        </app-task-card>
+      </section>
+    </ng-container>
+  </ng-container>
+
+  <div class="empty-state" *ngIf="tasks.length === 0">
+    <span class="empty-icon"><mat-icon aria-hidden="true">checklist</mat-icon></span>
+    <h3>Une page toute neuve</h3>
+    <p>Rien de prévu pour le moment. Ajoutez une première tâche pour commencer.</p>
+  </div>
+</div>
+<p class="sr-only" aria-live="polite">{{ reorderAnnouncement() }}</p>

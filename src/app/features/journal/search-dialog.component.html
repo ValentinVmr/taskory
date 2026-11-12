@@ -1,0 +1,77 @@
+<div class="dialog-header">
+  <div>
+    <h2 mat-dialog-title>Rechercher</h2>
+    <p>Retrouvez une tâche dans votre journal.</p>
+  </div>
+  <button
+    class="btn btn-ghost btn-square"
+    type="button"
+    (click)="cancel()"
+    aria-label="Fermer la recherche"
+  >
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <label class="field-label" for="task-search">Description ou numéro de ticket</label>
+  <div class="search-input-wrap">
+    <mat-icon class="search-icon" aria-hidden="true">search</mat-icon>
+    <input
+      id="task-search"
+      class="input search-input"
+      type="search"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="onSearchChange($event)"
+      placeholder="Ex. PROJ-123 ou préparer la réunion"
+      aria-controls="search-results"
+    />
+    <button
+      class="btn btn-ghost btn-square clear-search"
+      *ngIf="searchQuery()"
+      type="button"
+      (click)="clearSearch()"
+      aria-label="Effacer la recherche"
+    >
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </div>
+
+  <div class="results" id="search-results" *ngIf="searchQuery().trim()" aria-live="polite">
+    <p class="results-count">
+      {{ searchResults().length }} résultat{{ searchResults().length === 1 ? '' : 's' }}
+    </p>
+    <div class="no-results" *ngIf="searchResults().length === 0">
+      <mat-icon aria-hidden="true">search_off</mat-icon>
+      <p>Aucune tâche ne correspond à cette recherche.</p>
+      <span>Essayez un autre mot-clé ou numéro de ticket.</span>
+    </div>
+
+    <div class="result-list" *ngIf="searchResults().length > 0">
+      <button
+        class="result-item"
+        type="button"
+        *ngFor="let task of searchResults()"
+        (click)="selectTask(task)"
+      >
+        <span class="result-content">
+          <span class="result-description">{{ task.description }}</span>
+          <span class="result-meta">
+            <span class="badge state-badge" [ngClass]="'state-' + task.state">{{
+              formatState(task.state)
+            }}</span>
+            <span>{{ formatDate(task.startDate) }}</span>
+            <span class="badge ticket-badge" *ngFor="let ticket of ticketNumbers(task)"
+              >#{{ ticket }}</span
+            >
+          </span>
+        </span>
+        <mat-icon class="result-chevron" aria-hidden="true">chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button class="btn btn-ghost" type="button" (click)="cancel()">Fermer</button>
+</mat-dialog-actions>

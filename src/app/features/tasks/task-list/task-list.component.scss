@@ -1,0 +1,139 @@
+.task-list {
+  display: flex;
+  min-height: 80px;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 24px;
+}
+
+.task-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 3px;
+  color: var(--color-base-content);
+  font-size: 0.79rem;
+  font-weight: 800;
+}
+
+.group-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.group-in-progress .group-dot {
+  background: #d69a27;
+}
+.group-todo .group-dot {
+  background: #9da3b4;
+}
+.group-done .group-dot {
+  background: #47a67c;
+}
+.group-cancelled .group-dot {
+  background: #d57b83;
+}
+
+.group-count {
+  min-width: 24px;
+  height: 22px;
+  padding: 0 7px;
+  border: 0;
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #777e91;
+  cursor: grab;
+  touch-action: none;
+}
+
+.drag-handle:hover,
+.drag-handle:focus-visible {
+  background: var(--surface-subtle);
+  color: var(--color-primary);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle mat-icon {
+  width: 19px;
+  height: 19px;
+  font-size: 19px;
+}
+
+.empty-state {
+  display: flex;
+  min-height: 270px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 32px 20px;
+  border: 1px dashed #d8dce9;
+  border-radius: 16px;
+  background: #fbfbfd;
+  text-align: center;
+}
+
+.empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 15px;
+  border-radius: 18px;
+  background: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.empty-state h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.empty-state p {
+  max-width: 280px;
+  margin: 7px 0 0;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.cdk-drag-preview {
+  border-radius: 14px;
+  box-shadow: 0 14px 40px rgba(37, 40, 58, 0.18);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms ease;
+}

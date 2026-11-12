@@ -1,0 +1,95 @@
+<div class="task-card card" [ngClass]="stateClass">
+  <ng-content></ng-content>
+
+  <button
+    class="state-button"
+    type="button"
+    (click)="cycleState()"
+    [attr.aria-label]="stateLabel + ' : ' + task.description"
+    [matTooltip]="stateLabel"
+  >
+    <span class="state-indicator" [ngClass]="stateClass">
+      <ng-container [ngSwitch]="task.state">
+        <mat-icon *ngSwitchCase="'IN_PROGRESS'" aria-hidden="true">remove</mat-icon>
+        <mat-icon *ngSwitchCase="'DONE'" aria-hidden="true">check</mat-icon>
+        <mat-icon *ngSwitchCase="'CANCELLED'" aria-hidden="true">close</mat-icon>
+      </ng-container>
+    </span>
+  </button>
+
+  <div class="task-content">
+    <p
+      class="task-description"
+      [class.closed-text]="task.state === 'DONE' || task.state === 'CANCELLED'"
+    >
+      {{ task.description }}
+    </p>
+
+    <div class="task-tags" *ngIf="ticketNumbers().length || task.carriedOver">
+      <span class="badge ticket-badge" *ngFor="let ticket of ticketNumbers()">#{{ ticket }}</span>
+      <span
+        class="badge carried-badge"
+        *ngIf="task.carriedOver"
+        matTooltip="Reportée du jour précédent"
+      >
+        <mat-icon aria-hidden="true">subdirectory_arrow_right</mat-icon>
+        Reportée
+      </span>
+    </div>
+
+    <div class="task-footer">
+      <div class="task-dates">
+        <span
+          ><mat-icon aria-hidden="true">calendar_today</mat-icon> Créée le
+          {{ task.startDate | localDate }}</span
+        >
+        <span *ngIf="task.endDate">
+          <mat-icon aria-hidden="true">check_circle_outline</mat-icon>
+          {{ task.state === 'CANCELLED' ? 'Clôturée' : 'Terminée' }} le
+          {{ task.endDate | localDate }}
+        </span>
+      </div>
+
+      <div class="task-actions">
+        <button
+          class="btn btn-ghost btn-square action-btn"
+          type="button"
+          *ngIf="task.state !== 'CANCELLED'"
+          (click)="cancelTask()"
+          [attr.aria-label]="'Annuler la tâche : ' + task.description"
+          matTooltip="Annuler la tâche"
+        >
+          <mat-icon aria-hidden="true">block</mat-icon>
+        </button>
+        <button
+          class="btn btn-ghost btn-square action-btn"
+          type="button"
+          *ngIf="task.state === 'CANCELLED'"
+          (click)="reopenTask()"
+          [attr.aria-label]="'Rouvrir la tâche : ' + task.description"
+          matTooltip="Rouvrir la tâche"
+        >
+          <mat-icon aria-hidden="true">replay</mat-icon>
+        </button>
+        <button
+          class="btn btn-ghost btn-square action-btn"
+          type="button"
+          (click)="edit.emit(task)"
+          [attr.aria-label]="'Modifier la tâche : ' + task.description"
+          matTooltip="Modifier"
+        >
+          <mat-icon aria-hidden="true">edit</mat-icon>
+        </button>
+        <button
+          class="btn btn-ghost btn-square action-btn action-danger"
+          type="button"
+          (click)="delete()"
+          [attr.aria-label]="'Supprimer la tâche : ' + task.description"
+          matTooltip="Supprimer"
+        >
+          <mat-icon aria-hidden="true">delete_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

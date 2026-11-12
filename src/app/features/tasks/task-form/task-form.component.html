@@ -1,0 +1,80 @@
+<div class="dialog-header">
+  <div>
+    <h2 mat-dialog-title>{{ data.task ? 'Modifier la tâche' : 'Nouvelle tâche' }}</h2>
+    <p>
+      {{
+        data.task
+          ? 'Ajustez les détails de votre tâche.'
+          : 'Une petite étape de plus dans votre journée.'
+      }}
+    </p>
+  </div>
+  <button
+    class="btn btn-ghost btn-square"
+    type="button"
+    (click)="dialogRef.close()"
+    aria-label="Fermer"
+  >
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="task-form" (ngSubmit)="submit()">
+    <div>
+      <label class="field-label" for="task-description"
+        >Description <span aria-hidden="true">*</span></label
+      >
+      <textarea
+        id="task-description"
+        class="textarea"
+        formControlName="description"
+        rows="3"
+        placeholder="Que souhaitez-vous accomplir ?"
+        required
+        [attr.aria-invalid]="
+          form.get('description')?.invalid && form.get('description')?.touched ? 'true' : null
+        "
+        [attr.aria-describedby]="
+          form.get('description')?.invalid && form.get('description')?.touched
+            ? 'description-error'
+            : null
+        "
+      ></textarea>
+      <p
+        class="field-error"
+        id="description-error"
+        role="alert"
+        *ngIf="form.get('description')?.hasError('required') && form.get('description')?.touched"
+      >
+        La description est obligatoire.
+      </p>
+    </div>
+
+    <div>
+      <label class="field-label" for="task-tickets"
+        >N° de ticket ou tags <span class="optional">(facultatif)</span></label
+      >
+      <input
+        id="task-tickets"
+        class="input"
+        formControlName="ticketNumber"
+        placeholder="Ex. PROJ-123, urgent, backend"
+        aria-describedby="ticket-hint"
+      />
+      <p class="field-hint" id="ticket-hint">Séparez plusieurs éléments par des virgules.</p>
+    </div>
+
+    <label class="checkbox-row" *ngIf="!data.task">
+      <input class="checkbox checkbox-primary" type="checkbox" formControlName="createAnother" />
+      <span>Créer une autre tâche juste après</span>
+    </label>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button class="btn btn-ghost" type="button" (click)="dialogRef.close()">Annuler</button>
+  <button class="btn btn-primary" type="button" (click)="submit()" [disabled]="form.invalid">
+    {{ data.task ? 'Enregistrer' : 'Créer la tâche' }}
+  </button>
+</mat-dialog-actions>

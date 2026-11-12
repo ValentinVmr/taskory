@@ -1,85 +1,341 @@
-/* You can add global styles to this file, and also import other style files */
-
 @use '@angular/material' as mat;
+@use 'tailwindcss';
 
-$todo-plus-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: mat.$azure-palette,
-    tertiary: mat.$rose-palette,
-  ),
-  typography: (
-    brand-family: 'Roboto',
-  ),
-  density: (
-    scale: 0,
+@plugin "daisyui" {
+  themes: false;
+  logs: false;
+}
+
+@plugin "daisyui/theme" {
+  name: 'taskory';
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #f7f7fb;
+  --color-base-300: #e7e8f0;
+  --color-base-content: #25283a;
+  --color-primary: #3f51b5;
+  --color-primary-content: #ffffff;
+  --color-secondary: #e9ecfa;
+  --color-secondary-content: #344386;
+  --color-accent: #197866;
+  --color-accent-content: #ffffff;
+  --color-neutral: #292d40;
+  --color-neutral-content: #ffffff;
+  --color-info: #3d66a6;
+  --color-info-content: #ffffff;
+  --color-success: #207652;
+  --color-success-content: #ffffff;
+  --color-warning: #946000;
+  --color-warning-content: #ffffff;
+  --color-error: #b93845;
+  --color-error-content: #ffffff;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1.25rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}
+
+$todo-plus-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+      tertiary: mat.$rose-palette,
+    ),
+    typography: (
+      brand-family: 'Manrope Variable',
+      plain-family: 'Manrope Variable',
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
+);
 
 html {
   @include mat.all-component-themes($todo-plus-theme);
   @include mat.core();
+
   color-scheme: light;
-}
-
-// Material Icons font
-.material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-}
-
-// Fix mat-form-field label & error colors
-.mat-mdc-form-field {
-  width: 100%;
-
-  .mat-mdc-floating-label {
-    color: rgba(0, 0, 0, 0.6) !important;
-  }
-
-  &.mat-form-field-invalid .mat-mdc-floating-label {
-    color: #c62828 !important;
-  }
-}
-
-.mat-mdc-form-field-error {
-  color: #c62828 !important;
-  font-size: 0.75rem;
-}
-
-mat-error, .mat-error {
-  color: #c62828 !important;
-}
-
-// Fix outline field notch label
-.mdc-notched-outline__notch {
-  border-right: none !important;
+  --text-muted: #626779;
+  --surface-border: #e6e8f0;
+  --surface-subtle: #f7f8fc;
+  --status-todo: #5d6377;
+  --status-todo-bg: #f0f1f6;
+  --status-progress: #805100;
+  --status-progress-bg: #fff5dc;
+  --status-done: #17684a;
+  --status-done-bg: #e8f6ef;
+  --status-cancelled: #a03542;
+  --status-cancelled-bg: #fcecef;
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
+body {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
-  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  background: #f7f8fc;
-  color: #212121;
-  display: flex;
-  justify-content: center;
+  background: var(--color-base-200);
+  color: var(--color-base-content);
+  font-family: 'Manrope Variable', 'Helvetica Neue', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 app-root {
-  width: 100%;
-  max-width: 720px;
+  display: block;
+  min-height: 100dvh;
 }
 
-html, body { height: 100%; }
+.material-icons {
+  display: inline-block;
+  font-family: 'Material Icons';
+  font-size: 24px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.btn {
+  min-height: 44px;
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: 0;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.btn.btn-square {
+  width: 44px;
+  min-width: 44px;
+}
+
+.btn mat-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+:is(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.cdk-overlay-pane .mat-mdc-dialog-surface {
+  border: 1px solid var(--surface-border);
+  border-radius: 22px;
+  background: var(--color-base-100);
+  box-shadow: 0 24px 80px rgba(30, 34, 57, 0.2);
+}
+
+.dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 26px 28px 18px;
+}
+
+.dialog-header h2[mat-dialog-title] {
+  margin: 0;
+  padding: 0;
+  color: var(--color-base-content);
+  font:
+    800 1.3rem/1.3 'Manrope Variable',
+    'Helvetica Neue',
+    sans-serif;
+  letter-spacing: -0.035em;
+}
+
+.dialog-header h2[mat-dialog-title]::before {
+  display: none;
+}
+
+.dialog-header p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.dialog-header .btn {
+  margin: -8px -8px 0 0;
+  color: var(--text-muted);
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-content.dialog-content {
+  max-height: min(65dvh, 640px);
+  padding: 0 28px 8px;
+  color: var(--color-base-content);
+  font: inherit;
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-actions.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 0;
+  padding: 18px 28px 26px;
+}
+
+.confirmation-heading {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 14px;
+  padding: 30px 28px 12px;
+  text-align: center;
+}
+
+.confirmation-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 17px;
+  background: var(--status-cancelled-bg);
+  color: var(--status-cancelled);
+}
+
+.confirmation-heading h2[mat-dialog-title] {
+  margin: 0;
+  padding: 0;
+  color: var(--color-base-content);
+  font:
+    800 1.15rem/1.35 'Manrope Variable',
+    'Helvetica Neue',
+    sans-serif;
+  letter-spacing: -0.035em;
+}
+
+.confirmation-heading h2[mat-dialog-title]::before {
+  display: none;
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-content.confirmation-content {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.confirmation-content p {
+  margin: 0 0 5px;
+}
+
+.confirmation-content .confirmation-task {
+  margin-bottom: 10px;
+  color: var(--color-base-content);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-actions.confirmation-actions {
+  justify-content: center;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-base-content);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.field-hint {
+  margin: 7px 0 0;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.field-error {
+  margin: 7px 0 0;
+  color: var(--color-error);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  min-height: 48px;
+  border-color: #d8dbe6;
+  background: var(--color-base-100);
+  color: var(--color-base-content);
+  font-size: 1rem;
+}
+
+.textarea {
+  min-height: 112px;
+  padding: 12px 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: #777d8f;
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  .dialog-header {
+    padding: 22px 20px 16px;
+  }
+
+  .mat-mdc-dialog-container .mat-mdc-dialog-content.dialog-content {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .mat-mdc-dialog-container .mat-mdc-dialog-actions.dialog-actions {
+    padding: 16px 20px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

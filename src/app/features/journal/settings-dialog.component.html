@@ -1,0 +1,164 @@
+<div class="dialog-header">
+  <div>
+    <h2 mat-dialog-title>Paramètres</h2>
+    <p>Un journal qui s'adapte à votre façon de travailler.</p>
+  </div>
+  <button
+    class="btn btn-ghost btn-square"
+    type="button"
+    (click)="dialogRef.close()"
+    aria-label="Fermer les paramètres"
+  >
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content class="dialog-content">
+  <form [formGroup]="form" class="settings-form">
+    <section class="settings-section" aria-labelledby="ai-settings-title">
+      <label class="toggle-row" for="ai-enabled">
+        <span class="setting-icon"><mat-icon aria-hidden="true">auto_awesome</mat-icon></span>
+        <span class="toggle-copy">
+          <strong id="ai-settings-title">Résumé par IA</strong>
+          <span>{{
+            form.get('enabled')?.value
+              ? 'Activé avec le fournisseur choisi'
+              : 'Désactivé : résumé local uniquement'
+          }}</span>
+        </span>
+        <input
+          id="ai-enabled"
+          class="toggle toggle-primary"
+          type="checkbox"
+          formControlName="enabled"
+        />
+      </label>
+
+      <ng-container *ngIf="form.get('enabled')?.value">
+        <fieldset class="provider-fieldset">
+          <legend class="field-label">Fournisseur</legend>
+          <div class="provider-grid">
+            <button
+              class="btn provider-card"
+              *ngFor="let provider of providers"
+              type="button"
+              [class.selected]="form.get('provider')?.value === provider.id"
+              [attr.aria-pressed]="form.get('provider')?.value === provider.id"
+              (click)="selectProvider(provider)"
+            >
+              <span class="provider-initial" aria-hidden="true">{{
+                provider.label.charAt(0)
+              }}</span>
+              <span>{{ provider.label }}</span>
+              <mat-icon *ngIf="form.get('provider')?.value === provider.id" aria-hidden="true"
+                >check</mat-icon
+              >
+            </button>
+          </div>
+        </fieldset>
+
+        <div *ngIf="currentProvider as provider">
+          <label class="field-label" for="ai-model">Modèle</label>
+          <select id="ai-model" class="select" formControlName="model">
+            <option *ngFor="let model of provider.models" [value]="model.id">
+              {{ model.label }}
+            </option>
+          </select>
+        </div>
+
+        <div *ngIf="currentProvider as provider">
+          <label class="field-label" for="api-key">Clé API {{ provider.label }}</label>
+          <div class="api-key-wrap">
+            <input
+              id="api-key"
+              class="input"
+              [type]="showKey ? 'text' : 'password'"
+              formControlName="apiKey"
+              placeholder="Votre clé API"
+              autocomplete="off"
+              aria-describedby="api-key-hint"
+            />
+            <button
+              class="btn btn-ghost btn-square"
+              type="button"
+              (click)="showKey = !showKey"
+              [attr.aria-label]="showKey ? 'Masquer la clé API' : 'Afficher la clé API'"
+            >
+              <mat-icon aria-hidden="true">{{
+                showKey ? 'visibility_off' : 'visibility'
+              }}</mat-icon>
+            </button>
+          </div>
+          <p class="field-hint" id="api-key-hint">
+            <a class="doc-link" [href]="provider.docUrl" target="_blank" rel="noopener noreferrer">
+              Obtenir une clé API {{ provider.label }}
+              <mat-icon aria-hidden="true">open_in_new</mat-icon>
+            </a>
+          </p>
+        </div>
+
+        <div class="privacy-note">
+          <mat-icon aria-hidden="true">info_outline</mat-icon>
+          <span
+            >Sans clé, le résumé reste local. Si l'IA est activée, les tâches sont envoyées au
+            fournisseur choisi pour générer le résumé.</span
+          >
+        </div>
+      </ng-container>
+    </section>
+
+    <fieldset class="settings-section working-days">
+      <legend class="section-title">Jours ouvrés</legend>
+      <p class="section-description">
+        Choisissez les jours où vous souhaitez afficher votre journal.
+      </p>
+      <div class="working-days-grid">
+        <label class="day-option" *ngFor="let day of weekDays">
+          <input
+            #dayInput
+            class="checkbox checkbox-primary"
+            type="checkbox"
+            [checked]="isWorkingDay(day.value)"
+            (change)="toggleWorkingDay(day.value, dayInput.checked)"
+          />
+          <span>{{ day.label }}</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <section class="settings-section" aria-labelledby="export-title">
+      <h3 class="section-title" id="export-title">Exporter vos tâches</h3>
+      <p class="section-description">Conservez une copie de vos tâches au format de votre choix.</p>
+      <div class="export-actions">
+        <button
+          class="btn btn-outline"
+          type="button"
+          (click)="exportTasks('json')"
+          [disabled]="allTaskCount() === 0"
+        >
+          <mat-icon aria-hidden="true">data_object</mat-icon> JSON
+        </button>
+        <button
+          class="btn btn-outline"
+          type="button"
+          (click)="exportTasks('csv')"
+          [disabled]="allTaskCount() === 0"
+        >
+          <mat-icon aria-hidden="true">table_view</mat-icon> CSV
+        </button>
+      </div>
+      <p class="field-hint">
+        {{ allTaskCount() }} tâche{{ allTaskCount() === 1 ? '' : 's' }} disponible{{
+          allTaskCount() === 1 ? '' : 's'
+        }}
+      </p>
+    </section>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button class="btn btn-ghost" type="button" (click)="dialogRef.close()">Annuler</button>
+  <button class="btn btn-primary" type="button" (click)="save()" [disabled]="form.invalid">
+    Enregistrer
+  </button>
+</mat-dialog-actions>

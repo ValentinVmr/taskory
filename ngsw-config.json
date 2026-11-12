@@ -12,6 +12,9 @@
           "/index.csr.html",
           "/index.html",
           "/manifest.webmanifest",
+          "/icons/icon-72x72.png",
+          "/licenses/**/LICENSE",
+          "/media/*.(woff|woff2)",
           "/*.css",
           "/*.js"
         ]
@@ -23,20 +26,6 @@
       "updateMode": "prefetch",
       "resources": {
         "files": ["/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"]
-      }
-    }
-  ],
-  "dataGroups": [
-    {
-      "name": "material-fonts",
-      "urls": [
-        "https://fonts.googleapis.com/**",
-        "https://fonts.gstatic.com/**"
-      ],
-      "cacheConfig": {
-        "strategy": "performance",
-        "maxSize": 20,
-        "maxAge": "30d"
       }
     }
   ]
